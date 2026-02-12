@@ -1,0 +1,36 @@
+<?php
+
+use App\Http\Controllers\SupportAgentController;
+use App\Http\Controllers\SupportController;
+use App\Http\Controllers\SupportTechController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+Route::get('/', function () {
+    return Inertia::render('Home', [
+        'user' => [
+            'name' => 'Alex',
+        ],
+    ]);
+});
+Route::get('/support', [SupportController::class, 'showLoginForm']);
+Route::post('/support', [SupportController::class, 'login']);
+Route::get('/support/agent', [SupportAgentController::class, 'index']);
+Route::post('/support/agent/create', [SupportAgentController::class, 'createTicket'])
+    ->name('support.agent.create');
+
+Route::post('/support/agent/check', [SupportAgentController::class, 'check']);
+
+Route::post('/support/agent/message', [SupportAgentController::class, 'sendMessage']);
+
+Route::get('/support/tech', [SupportTechController::class, 'index'])
+    ->name('support.tech');
+
+Route::post('/support/tech/send', [SupportTechController::class, 'sendMessage'])
+    ->name('support.tech.send');
+
+Route::post('/support/tech/close/{id}', [SupportTechController::class, 'close'])
+    ->name('support.tech.close');
+
+Route::post('/support/tech/reopen/{id}', [SupportTechController::class, 'reopen'])
+    ->name('support.tech.reopen');
