@@ -39,29 +39,29 @@ body { background: #f0f0f0; font-family: Arial, sans-serif; }
         </div>
     </div>
 
-    @if(!empty($current_ticket))
+    @if(!empty($currentTicket))
         <div class="ticket-card">
             <div class="ticket-header">
                 <div>
-                    <strong>#{{ $current_ticket->id }}</strong> — {{ $current_ticket->user_id_or_email }}
+                    <strong>#{{ $currentTicket->id }}</strong> — {{ $currentTicket->user_id_or_email }}
                     @php
-                        $status = $current_ticket->status ?? 'new';
+                        $status = $currentTicket->status ?? 'new';
                         $badgeClass = $status==='answered' ? 'badge-answered' : ($status==='closed' ? 'badge-closed' : 'badge-new');
                         $badgeText = $status==='answered'?'Ответ получен':($status==='closed'?'Закрыт':'Ожидает ответа');
                     @endphp
                     <span class="badge {{ $badgeClass }}">{{ $badgeText }}</span>
                 </div>
                 <div>
-                    <form method="POST" action="{{ $current_ticket->status==='closed'?route('support.reopen_ticket'):route('support.close_ticket') }}" style="display:inline;">
+                    <form method="POST" action="{{ $currentTicket->status==='closed'?route('support.reopen_ticket'):route('support.close_ticket') }}" style="display:inline;">
                         @csrf
-                        <input type="hidden" name="ticket_id" value="{{ $current_ticket->id }}">
-                        <button class="button button-gray">{{ $current_ticket->status==='closed'?'Открыть':'Закрыть' }}</button>
+                        <input type="hidden" name="ticket_id" value="{{ $currentTicket->id }}">
+                        <button class="button button-gray" >{{ $currentTicket->status==='closed'?'Открыть':'Закрыть' }}</button>
                     </form>
                     <a class="button button-blue" href="{{ url()->current() }}">Назад</a>
                 </div>
             </div>
             <div class="ticket-body" id="chatArea">
-                @foreach($chat_messages as $msg)
+                @foreach($chatMessages as $msg)
                     @php
                         $role = $msg['role'] ?? 'support';
                         $isMine = $role==='support';
@@ -69,16 +69,23 @@ body { background: #f0f0f0; font-family: Arial, sans-serif; }
                     <div class="chat-bubble {{ $isMine?'chat-support':'chat-tech' }}">
                         {!! nl2br(e($msg['text'] ?? '')) !!}
                         @if(!empty($msg['file']))
-                            <div><a href="{{ Storage::url($msg['file']) }}" target="_blank">📎 {{ basename($msg['file']) }}</a></div>
-                        @endif
+    <div>
+        <a href="{{ Storage::url($msg['file']) }}" target="_blank">
+            📎 {{ basename($msg['file']) }}
+        </a>
+    </div>
+@endif
+
                         <div class="chat-timestamp">{{ $msg['timestamp'] ?? '' }} {{ $isMine?'(Агент)':'(Техспец)' }}</div>
                     </div>
                 @endforeach
             </div>
+
+
             <div style="padding:10px; border-top:1px solid #ddd;">
-                <form method="POST" enctype="multipart/form-data" action="{{ route('support.send_message') }}" style="display:flex; gap:10px;">
+                <form method="POST" enctype="multipart/form-data" action="{{ route('support.sendMessage') }}" style="display:flex; gap:10px;">
                     @csrf
-                    <input type="hidden" name="ticket_id" value="{{ $current_ticket->id }}">
+                    <input type="hidden" name="ticket_id" value="{{ $currentTicket->id }}">
                     <textarea name="message" placeholder="Напишите сообщение..." class="input" rows="2"></textarea>
                     <input type="file" name="chat_file">
                     <button class="button button-blue">➤</button>
@@ -90,6 +97,23 @@ body { background: #f0f0f0; font-family: Arial, sans-serif; }
         <div style="margin-bottom:20px;">
             <input type="text" id="search" placeholder="Поиск по ID или email" class="input" value="{{ $search }}">
             <button onclick="searchTickets()" class="button button-gray">Найти</button>
+            <div class="flex gap-4 mt-6">
+    <a href="{{ route('support.agent', array_merge(request()->all(), ['tab' => 'active', 'sort' => 'answered'])) }}"
+       class="{{ ($tab === 'active' && $sort === 'answered') ? 'bg-blue-500 text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200' }} px-6 py-3 rounded-xl font-semibold transition-all">
+        Answered first
+    </a>
+
+    <a href="{{ route('support.agent', array_merge(request()->all(), ['tab' => 'active', 'sort' => 'date'])) }}"
+       class="{{ ($tab === 'active' && $sort === 'date') ? 'bg-blue-500 text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200' }} px-6 py-3 rounded-xl font-semibold transition-all">
+        По дате
+    </a>
+
+    <a href="{{ route('support.agent', array_merge(request()->all(), ['tab' => 'archive'] )) }}"
+       class="{{ ($tab === 'archive') ? 'bg-purple-500 text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200' }} px-6 py-3 rounded-xl font-semibold transition-all">
+        📁 Архив
+    </a>
+</div>
+
         </div>
         <table class="table">
             <thead>
@@ -204,11 +228,17 @@ function closeSubModal(){document.getElementById('subModal').style.display='none
 function searchTickets(){
     let s = document.getElementById('search').value;
     let u = new URL(window.location.href);
-    u.searchParams.set('search', encodeURIComponent(s));
+u.searchParams.set('search', s);
+
     u.searchParams.delete('id'); // <--- сбрасываем выбранный тикет
     window.location.href = u.toString();
 }
-function viewTicket(id){let u=new URL(window.location); u.searchParams.set('id',id); window.location=u;}
+function viewTicket(id){
+    let u = new URL(window.location);
+    u.searchParams.set('id', id);
+    window.location.href = u.toString(); // обязательно перезагрузка
+}
+
 @if(session('open_sub_modal'))
     openSubModal();
 @endif

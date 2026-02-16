@@ -15,13 +15,16 @@ Route::get('/', function () {
 });
 Route::get('/support', [SupportController::class, 'showLoginForm']);
 Route::post('/support', [SupportController::class, 'login']);
-Route::get('/support/agent', [SupportAgentController::class, 'index']);
+Route::get('/support/agent', [SupportAgentController::class, 'index'])->name('support.agent');
 Route::post('/support/agent/create', [SupportAgentController::class, 'createTicket'])
     ->name('support.agent.create');
-
-Route::post('/support/agent/check', [SupportAgentController::class, 'check']);
-
-Route::post('/support/agent/message', [SupportAgentController::class, 'sendMessage']);
+Route::post('/support/agent/check', [SupportAgentController::class, 'checkSubscription']);
+Route::post('/support/agent/message', [SupportAgentController::class, 'sendMessage'])
+    ->name('support.sendMessage');
+Route::post('/support/agent/close', [SupportAgentController::class, 'closeTicket'])
+    ->name('support.close_ticket');
+Route::post('/support/agent/reopen', [SupportAgentController::class, 'reopenTicket'])
+    ->name('support.reopen_ticket');
 
 Route::get('/support/tech', [SupportTechController::class, 'index'])
     ->name('support.tech');

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Hash;
-use App\Models\SupportUser; // если будешь проверять БД
+
+// если будешь проверять БД
 
 class SupportController extends Controller
 {
@@ -40,27 +40,13 @@ class SupportController extends Controller
 
             // Редирект в зависимости от роли
             $redirect_url = $role === 'support' ? '/support/agent' : '/support/tech';
+
             return redirect($redirect_url);
         }
-
-        // --- Если хочешь проверку через базу данных ---
-        /*
-        $user = SupportUser::where('login', $login)
-            ->where('role', $role)
-            ->first();
-
-        if ($user && Hash::check($password, $user->password)) {
-            Session::put('logged_in', true);
-            Session::put('role', $user->role);
-            Session::put('user_id', $user->id);
-
-            $redirect_url = $role === 'support' ? '/support/agent' : '/support/tech';
-            return redirect($redirect_url);
-        }
-        */
 
         // Ошибка авторизации
         $error = 'Неверный логин или пароль';
+
         return back()->withErrors([$error])->withInput();
     }
 }

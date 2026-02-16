@@ -6,7 +6,6 @@ use App\Models\Subscription;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use PDO;
 
 class SupportAgentController extends Controller
 {
@@ -23,28 +22,42 @@ class SupportAgentController extends Controller
     // Список тикетов и чат
     public function index(Request $request)
     {
-        $this->checkAuth(); // <-- проверка сессии
+        $this->checkAuth();
 
         $search = trim($request->query('search', ''));
         $tab = $request->query('tab', 'active');
         $sort = $request->query('sort', 'answered');
 
-        // Получаем тикеты через Eloquent или PDO (зависит от твоей реализации)
         $tickets = Ticket::query()
-            ->when($tab === 'archive', fn ($q) => $q->where('status', 'closed'), fn ($q) => $q->whereIn('status', ['new', 'answered']))
-            ->when($search !== '', fn ($q) => $q->where('user_id_or_email', 'like', "%$search%"))
-            ->orderByRaw($sort === 'date' ? 'created_at DESC' : "FIELD(status,'answered') ASC, created_at DESC")
-            ->get();
+            ->when($tab === 'archive', fn ($q) => $q->where('status', 'closed'))
+            ->when($tab !== 'archive', fn ($q) => $q->whereIn('status', ['new', 'answered']))
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    if (is_numeric($search)) {
+                        $query->where('id', (int) $search);
+                    } else {
+                        $query->where('user_id_or_email', 'like', "%{$search}%");
+                    }
+                });
+            });
+
+        if ($sort === 'date') {
+            $tickets = $tickets->orderBy('created_at', 'desc');
+        } else {
+            $tickets = $tickets->orderByRaw("FIELD(status,'answered') ASC")
+                ->orderBy('created_at', 'desc');
+        }
+
+        $tickets = $tickets->get();
 
         $ticketId = (int) $request->query('id', 0);
         $currentTicket = $ticketId ? Ticket::find($ticketId) : null;
-
         $chatMessages = $currentTicket ? json_decode($currentTicket->chat_messages ?? '[]', true) : [];
 
         return view('support.agent', compact('tickets', 'currentTicket', 'chatMessages', 'tab', 'sort', 'search'));
     }
 
-    public function check(Request $request)
+    public function checkSubscription(Request $request)
     {
         $request->validate([
             'sub_user_id' => 'required|integer',
@@ -86,6 +99,32 @@ class SupportAgentController extends Controller
                 'subscription_result_type' => $resultType,
                 'open_sub_modal' => true,
             ]);
+    }
+
+    public function closeTicket(Request $request)
+    {
+        $this->checkAuth();
+        $ticketId = $request->input('ticket_id');
+        $ticket = Ticket::find($ticketId);
+        if ($ticket) {
+            $ticket->status = 'closed';
+            $ticket->save();
+        }
+
+        return redirect()->route('support.agent');
+    }
+
+    public function reopenTicket(Request $request)
+    {
+        $this->checkAuth();
+        $ticketId = $request->input('ticket_id');
+        $ticket = Ticket::find($ticketId);
+        if ($ticket) {
+            $ticket->status = 'new';
+            $ticket->save();
+        }
+
+        return redirect()->back();
     }
 
     // Создание тикета
