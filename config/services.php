@@ -13,7 +13,10 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
-
+    'authData' => [
+        'support_login' => env('SUPPORT_LOGIN'),
+        'support_password' => env('SUPPORT_PASSWORD'),
+    ],
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
