@@ -10,8 +10,11 @@ class SupportAgentAuth
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!Session::get('logged_in') || Session::get('role') !== 'support') {
-            return redirect('/support');
+         $loggedIn = $request->session()->get('logged_in');
+        $role = $request->session()->get('role');
+
+        if (!$loggedIn || $role !== 'support') {
+            return redirect('/support'); 
         }
 
         return $next($request);

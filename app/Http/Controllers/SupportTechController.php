@@ -4,21 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Ticket;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use App\Services\CheckAuth;
+use App\Services\ControlTicketsStatus;
+use App\Services\SendMessage;
 
 class SupportTechController extends Controller
 {
-    private function checkAccess()
-    {
-        if (! Session::get('logged_in') || Session::get('role') !== 'tech') {
-            abort(403);
-        }
-    }
-
+    protected $allowedFileExt = ['jpg', 'jpeg', 'png', 'pdf', 'zip', 'txt'];
+    public function __construct(
+        protected CheckAuth $checkAuth,
+        protected ControlTicketsStatus $controlTicketsStatus,
+        protected SendMessage $sendMessage,
+    ) {}
     public function index(Request $request)
     {
-        $this->checkAccess();
-
+    
+    /** 
+     * Проверка авторизации через сервис
+     */ 
+        if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
         $search = trim($request->query('search', ''));
         $tab = $request->query('tab', 'active');
         $sort = $request->query('sort', 'answered');
@@ -68,44 +74,54 @@ class SupportTechController extends Controller
 
     }
 
+    /**
+     * Ф-я отправки сообщений
+     */
     public function sendMessage(Request $request)
     {
-        $this->checkAccess();
+        if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
 
-        $ticket = Ticket::findOrFail($request->ticket_id);
+        $ticketId = (int) $request->input('ticket_id', 0);
 
-        $chat = json_decode($ticket->chat_messages ?? '[]', true);
-        if (! is_array($chat)) {
-            $chat = [];
+        $messageText = trim($request->input('message', '')); 
+        $filePath = null;
+
+        if ($request->hasFile('chat_file')) {
+            $file = $request->file('chat_file');
+            if (in_array($file->getClientOriginalExtension(), $this->allowedFileExt, true)) {
+                $filePath = $file->store('uploads', 'public');
+            }
         }
 
-        $chat[] = [
-            'id' => uniqid(),
-            'role' => 'tech',
-            'text' => $request->message,
-            'timestamp' => now()->format('Y-m-d H:i:s'),
-        ];
+        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath);
 
-        $ticket->chat_messages = json_encode($chat, JSON_UNESCAPED_UNICODE);
-        $ticket->status = 'answered';
-        $ticket->save();
-
-        return redirect()->route('support.tech', ['id' => $ticket->id]);
+        return redirect('/support/tech?id='.$ticketId);
     }
 
+        /**
+     * Ф-я закрытия тикета
+     */
     public function close($id)
     {
-        $this->checkAccess();
-        Ticket::where('id', $id)->update(['status' => 'closed']);
-
+        $this->controlTicketsStatus->closeTicket($id);
+        if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
         return redirect()->route('support.tech');
     }
 
+        /**
+     * Ф-я открытия тикета
+     */
     public function reopen($id)
     {
-        $this->checkAccess();
-        Ticket::where('id', $id)->update(['status' => 'new']);
+        if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
 
-        return redirect()->route('support.tech', ['id' => $id]);
+       $this->controlTicketsStatus->reopenTicket($id);
+        return redirect()->back();
     }
 }

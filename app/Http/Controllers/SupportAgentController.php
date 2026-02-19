@@ -2,53 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Subscription;
 use App\Models\Ticket;
+use App\Services\CheckAuth;
+use App\Services\CheckSubscription;
+use App\Services\ControlTicketsStatus;
+use App\Services\TicketService;
+use App\Services\SendMessage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 
 class SupportAgentController extends Controller
 {
     protected $allowedFileExt = ['jpg', 'jpeg', 'png', 'pdf', 'zip', 'txt'];
 
-    // Проверка авторизации прямо в методе
-    protected function checkAuth()
-    {
-        if (! Session::get('logged_in') || Session::get('role') !== 'support') {
-            abort(403, 'Доступ запрещён');
-        }
-    }
-
-    // Список тикетов и чат
+    /**
+     * Инициализация сервисов
+     */
+    public function __construct(
+        protected CheckAuth $checkAuth,
+        protected TicketService $tickets,
+        protected CheckSubscription $subscriptionService,
+        protected ControlTicketsStatus $controlTicketsStatus,
+        protected SendMessage $sendMessage,
+    ) {}
+    /**
+     * Список тикетов и чат
+      */ 
     public function index(Request $request)
     {
-        $this->checkAuth();
-
+    
+    /**
+     * Проверка авторизации
+     */
+    if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
         $search = trim($request->query('search', ''));
         $tab = $request->query('tab', 'active');
         $sort = $request->query('sort', 'answered');
 
-        $tickets = Ticket::query()
-            ->when($tab === 'archive', fn ($q) => $q->where('status', 'closed'))
-            ->when($tab !== 'archive', fn ($q) => $q->whereIn('status', ['new', 'answered']))
-            ->when($search !== '', function ($q) use ($search) {
-                $q->where(function ($query) use ($search) {
-                    if (is_numeric($search)) {
-                        $query->where('id', (int) $search);
-                    } else {
-                        $query->where('user_id_or_email', 'like', "%{$search}%");
-                    }
-                });
-            });
-
-        if ($sort === 'date') {
-            $tickets = $tickets->orderBy('created_at', 'desc');
-        } else {
-            $tickets = $tickets->orderByRaw("FIELD(status,'answered') ASC")
-                ->orderBy('created_at', 'desc');
-        }
-
-        $tickets = $tickets->get();
+/** 
+ * Получение тикетов через сервис
+*/
+        $tickets = $this->tickets->getTickets($search, $tab, $sort);
 
         $ticketId = (int) $request->query('id', 0);
         $currentTicket = $ticketId ? Ticket::find($ticketId) : null;
@@ -57,119 +52,110 @@ class SupportAgentController extends Controller
         return view('support.agent', compact('tickets', 'currentTicket', 'chatMessages', 'tab', 'sort', 'search'));
     }
 
+    /**
+     * Функция проверки подписки
+     */
     public function checkSubscription(Request $request)
     {
+        /**
+         * Валидация
+         */
         $request->validate([
             'sub_user_id' => 'required|integer',
         ]);
 
         $userId = $request->input('sub_user_id');
 
-        $subscription = Subscription::where('user_id', $userId)->first();
+        /**
+         * Использование сервиса чека подписки
+         */
+        $resultSubscribes = $this->subscriptionService->checkSubscription($userId);
 
-        $resultText = '';
-        $resultType = '';
 
-        if (! $subscription) {
-            $resultText = 'Подписка не найдена';
-            $resultType = 'info';
-        } elseif ($subscription->status === 'active') {
-            $expiresAt = $subscription->expires_at
-                ? $subscription->expires_at->format('d.m.Y H:i')
-                : 'неизвестно';
-            $autoRenew = $subscription->auto_renewal ? 'включено' : 'отключено';
-            $resultText = "Подписка активна до {$expiresAt}, автопродление {$autoRenew}";
-            $resultType = 'success';
-        } elseif ($subscription->status === 'pending') {
-            $createdAt = $subscription->created_at->format('d.m.Y H:i');
-            $resultText = "Попытка оформления подписки {$createdAt}, но не завершилась успехом";
-            $resultType = 'warning';
-        } elseif ($subscription->status === 'canceled') {
-            $resultText = 'Подписка отключена';
-            $resultType = 'danger';
-        } else {
-            $resultText = 'Статус подписки не распознан';
-            $resultType = 'info';
-        }
-
+        /**
+         * Вывод результата
+         */
         return redirect()->back()
             ->withInput()
             ->with([
-                'subscription_result_text' => $resultText,
-                'subscription_result_type' => $resultType,
+                'subscription_result_text' => $resultSubscribes['text'],
+                'subscription_result_type' => $resultSubscribes['type'],
                 'open_sub_modal' => true,
             ]);
     }
 
+    /**
+     * Ф-я закрытия тикета
+     */
     public function closeTicket(Request $request)
     {
-        $this->checkAuth();
+        if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
         $ticketId = $request->input('ticket_id');
-        $ticket = Ticket::find($ticketId);
-        if ($ticket) {
-            $ticket->status = 'closed';
-            $ticket->save();
-        }
+        $this->controlTicketsStatus->closeTicket($ticketId);
+
 
         return redirect()->route('support.agent');
     }
 
+    /**
+     * Ф-я открытия тикета
+     */
     public function reopenTicket(Request $request)
     {
-        $this->checkAuth();
+        if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
         $ticketId = $request->input('ticket_id');
-        $ticket = Ticket::find($ticketId);
-        if ($ticket) {
-            $ticket->status = 'new';
-            $ticket->save();
-        }
-
+$this->controlTicketsStatus->reopenTicket($ticketId);
         return redirect()->back();
     }
 
-    // Создание тикета
+    /**
+     * Ф-я создания тикета
+     */
     public function createTicket(Request $request)
     {
-        $this->checkAuth();
-
-        $request->validate([
-            'user_id_or_email' => 'required|string',
+        if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
+/**
+ * Валидация
+ */
+$validated = $request->validate([
+    'user_id_or_email' => 'required|string',
             'short_desc' => 'required|string',
             'full_desc' => 'required|string',
             'file' => 'nullable|file',
-        ]);
+]);
 
-        $filePath = null;
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            if (in_array($file->getClientOriginalExtension(), $this->allowedFileExt, true)) {
-                $filePath = $file->store('uploads', 'public');
-            }
-        }
+        /**
+         * Пер-я для передачи в арг-ты функции создания тикета сервиса
+         */
+        $ticketsCreate = [
+        'user_id_or_email' => $validated['user_id_or_email'],
+        'short_desc' => $validated['short_desc'],
+        'full_desc' => $validated['full_desc'],
+        'file' => $request->file('file'),
+    ];
 
-        Ticket::create([
-            'user_id_or_email' => $request->input('user_id_or_email'),
-            'short_desc' => $request->input('short_desc'),
-            'full_desc' => $request->input('full_desc'),
-            'file_path' => $filePath,
-            'status' => 'new',
-        ]);
+$this->tickets->createTickets($ticketsCreate);
 
         return redirect('/support/agent');
     }
 
-    // Отправка сообщения в чат
+    /**
+     * Ф-я отправки сообщений
+     */
     public function sendMessage(Request $request)
     {
-        $this->checkAuth();
-
+        if (!$this->checkAuth->checkAuth()) {
+    abort(403, 'Доступ запрещён');
+}
         $ticketId = (int) $request->input('ticket_id', 0);
-        $ticket = Ticket::find($ticketId);
-        if (! $ticket) {
-            abort(404, 'Тикет не найден');
-        }
 
-        $messageText = trim($request->input('message', ''));
+        $messageText = trim($request->input('message', '')); 
         $filePath = null;
 
         if ($request->hasFile('chat_file')) {
@@ -179,19 +165,7 @@ class SupportAgentController extends Controller
             }
         }
 
-        $chatMessages = json_decode($ticket->chat_messages ?? '[]', true);
-        $chatMessages[] = [
-            'id' => uniqid('m_', true),
-            'role' => 'support',
-            'text' => $messageText,
-            'file' => $filePath,
-            'timestamp' => now()->toDateTimeString(),
-        ];
-
-        $ticket->update([
-            'chat_messages' => json_encode($chatMessages, JSON_UNESCAPED_UNICODE),
-            'status' => 'answered',
-        ]);
+        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath);
 
         return redirect('/support/agent?id='.$ticketId);
     }
