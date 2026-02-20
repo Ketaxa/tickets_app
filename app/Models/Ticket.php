@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Orchid\Screen\AsSource;
 
 class Ticket extends Model
 {
+    use AsSource;
+
     protected $table = 'tickets';
 
     protected $fillable = [
@@ -14,7 +17,7 @@ class Ticket extends Model
         'full_desc',
         'file_path',
         'chat_messages',
-        'status'
+        'status',
     ];
 
     public $timestamps = true; // чтобы автоматически обновлялись created_at и updated_at

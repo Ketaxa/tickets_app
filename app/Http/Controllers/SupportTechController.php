@@ -3,28 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
-use Illuminate\Http\Request;
 use App\Services\CheckAuth;
 use App\Services\ControlTicketsStatus;
 use App\Services\SendMessage;
+use Illuminate\Http\Request;
 
 class SupportTechController extends Controller
 {
     protected $allowedFileExt = ['jpg', 'jpeg', 'png', 'pdf', 'zip', 'txt'];
+
     public function __construct(
         protected CheckAuth $checkAuth,
         protected ControlTicketsStatus $controlTicketsStatus,
         protected SendMessage $sendMessage,
     ) {}
+
     public function index(Request $request)
     {
-    
-    /** 
-     * Проверка авторизации через сервис
-     */ 
-        if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
         $search = trim($request->query('search', ''));
         $tab = $request->query('tab', 'active');
         $sort = $request->query('sort', 'answered');
@@ -79,13 +74,10 @@ class SupportTechController extends Controller
      */
     public function sendMessage(Request $request)
     {
-        if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
 
         $ticketId = (int) $request->input('ticket_id', 0);
 
-        $messageText = trim($request->input('message', '')); 
+        $messageText = trim($request->input('message', ''));
         $filePath = null;
 
         if ($request->hasFile('chat_file')) {
@@ -95,33 +87,30 @@ class SupportTechController extends Controller
             }
         }
 
-        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath);
+        $msgRole = $request->session()->get('role');
+        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath, $msgRole);
 
         return redirect('/support/tech?id='.$ticketId);
     }
 
-        /**
+    /**
      * Ф-я закрытия тикета
      */
     public function close($id)
     {
         $this->controlTicketsStatus->closeTicket($id);
-        if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
+
         return redirect()->route('support.tech');
     }
 
-        /**
+    /**
      * Ф-я открытия тикета
      */
     public function reopen($id)
     {
-        if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
 
-       $this->controlTicketsStatus->reopenTicket($id);
+        $this->controlTicketsStatus->reopenTicket($id);
+
         return redirect()->back();
     }
 }

@@ -1,17 +1,20 @@
 <?php
-namespace App\Services;
-use App\Models\Ticket;
 
+namespace App\Services;
+
+use App\Models\Ticket;
 
 class TicketService
 {
-        protected $allowedFileExt = ['jpg', 'jpeg', 'png', 'pdf', 'zip', 'txt'];
+    protected $allowedFileExt = ['jpg', 'jpeg', 'png', 'pdf', 'zip', 'txt'];
+
     /**
      * Ф-я получения тикетов и сортировки
-    */
-public function getTickets(string $search,
+     */
+    public function getTickets(string $search,
         string $tab,
-        string $sort) {
+        string $sort)
+    {
         $tickets = Ticket::query()
             ->when($tab === 'archive', fn ($q) => $q->where('status', 'closed'))
             ->when($tab !== 'archive', fn ($q) => $q->whereIn('status', ['new', 'answered']))
@@ -24,34 +27,43 @@ public function getTickets(string $search,
                     }
                 });
             });
-                /**
-     * Ф-я сортировки
-    */
-                    if ($sort === 'date') {
+        // $statuses = $tab === 'archive' ? ['closed'] : ['new', 'answered'];
+        // $tickets = Ticket::query()
+        //     ->whereIn('status', $statuses)
+        //     ->when($search, fn ($q) => is_numeric($search)
+        //             ? $q->whereKey((int) $search)
+        //             : $q->where('user_id_or_email', 'like', "%{$search}%")
+        //     );
+        /**
+         * Ф-я сортировки
+         */
+        if ($sort === 'date') {
             $tickets = $tickets->orderBy('created_at', 'desc');
         } else {
             $tickets = $tickets->orderByRaw("FIELD(status,'answered') ASC")
                 ->orderBy('created_at', 'desc');
         }
-            return $tickets->get();
+
+        return $tickets->get();
     }
-    
+
     /**
      * Сервис создания тикета
      */
-    public function createTickets(array $data) {
+    public function createTickets(array $data)
+    {
 
-    $filePath = null;
+        $filePath = null;
 
-    /**
-     * Условие на наличие файла в тикете
-     */
-    if (!empty($data['file'])) {
-        $file = $data['file'];
-        if (in_array($file->getClientOriginalExtension(), $this->allowedFileExt, true)) {
-            $filePath = $file->store('uploads', 'public');
+        /**
+         * Условие на наличие файла в тикете
+         */
+        if (! empty($data['file'])) {
+            $file = $data['file'];
+            if (in_array($file->getClientOriginalExtension(), $this->allowedFileExt, true)) {
+                $filePath = $file->store('uploads', 'public');
+            }
         }
-    }
 
         return Ticket::create([
             'user_id_or_email' => $data['user_id_or_email'],

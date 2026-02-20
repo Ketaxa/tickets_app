@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Session;
@@ -7,13 +8,13 @@ class AuthService
 {
     public function attempt(string $login, string $password, string $role): bool
     {
-        /** 
+        /**
          * Переменные для входа в .env
-        */
+         */
         $valid_login = config('services.authData.support_login');
         $valid_password = config('services.authData.support_password');
 
-                /**
+        /**
          * Проверка через переменные окружения
          */
         if (
@@ -30,9 +31,9 @@ class AuthService
         return false;
     }
 
-                /**
-             * Редирект в зависимости от роли
-             */
+    /**
+     * Редирект в зависимости от роли
+     */
     public function getRedirectUrl(string $role): string
     {
         return $role === 'support'

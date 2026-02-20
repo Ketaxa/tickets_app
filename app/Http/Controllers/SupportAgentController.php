@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
-use App\Services\CheckAuth;
+// use App\Services\CheckAuth;
 use App\Services\CheckSubscription;
 use App\Services\ControlTicketsStatus;
-use App\Services\TicketService;
 use App\Services\SendMessage;
+use App\Services\TicketService;
 use Illuminate\Http\Request;
 
 class SupportAgentController extends Controller
@@ -18,31 +18,26 @@ class SupportAgentController extends Controller
      * Инициализация сервисов
      */
     public function __construct(
-        protected CheckAuth $checkAuth,
+        // protected CheckAuth $checkAuth,
         protected TicketService $tickets,
         protected CheckSubscription $subscriptionService,
         protected ControlTicketsStatus $controlTicketsStatus,
         protected SendMessage $sendMessage,
     ) {}
+
     /**
      * Список тикетов и чат
-      */ 
+     */
     public function index(Request $request)
     {
-    
-    /**
-     * Проверка авторизации
-     */
-    if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
+
         $search = trim($request->query('search', ''));
         $tab = $request->query('tab', 'active');
         $sort = $request->query('sort', 'answered');
 
-/** 
- * Получение тикетов через сервис
-*/
+        /**
+         * Получение тикетов через сервис
+         */
         $tickets = $this->tickets->getTickets($search, $tab, $sort);
 
         $ticketId = (int) $request->query('id', 0);
@@ -71,7 +66,6 @@ class SupportAgentController extends Controller
          */
         $resultSubscribes = $this->subscriptionService->checkSubscription($userId);
 
-
         /**
          * Вывод результата
          */
@@ -89,12 +83,8 @@ class SupportAgentController extends Controller
      */
     public function closeTicket(Request $request)
     {
-        if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
         $ticketId = $request->input('ticket_id');
         $this->controlTicketsStatus->closeTicket($ticketId);
-
 
         return redirect()->route('support.agent');
     }
@@ -104,11 +94,10 @@ class SupportAgentController extends Controller
      */
     public function reopenTicket(Request $request)
     {
-        if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
+
         $ticketId = $request->input('ticket_id');
-$this->controlTicketsStatus->reopenTicket($ticketId);
+        $this->controlTicketsStatus->reopenTicket($ticketId);
+
         return redirect()->back();
     }
 
@@ -117,30 +106,28 @@ $this->controlTicketsStatus->reopenTicket($ticketId);
      */
     public function createTicket(Request $request)
     {
-        if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
-/**
- * Валидация
- */
-$validated = $request->validate([
-    'user_id_or_email' => 'required|string',
+
+        /**
+         * Валидация
+         */
+        $validated = $request->validate([
+            'user_id_or_email' => 'required|string',
             'short_desc' => 'required|string',
             'full_desc' => 'required|string',
             'file' => 'nullable|file',
-]);
+        ]);
 
         /**
          * Пер-я для передачи в арг-ты функции создания тикета сервиса
          */
         $ticketsCreate = [
-        'user_id_or_email' => $validated['user_id_or_email'],
-        'short_desc' => $validated['short_desc'],
-        'full_desc' => $validated['full_desc'],
-        'file' => $request->file('file'),
-    ];
+            'user_id_or_email' => $validated['user_id_or_email'],
+            'short_desc' => $validated['short_desc'],
+            'full_desc' => $validated['full_desc'],
+            'file' => $request->file('file'),
+        ];
 
-$this->tickets->createTickets($ticketsCreate);
+        $this->tickets->createTickets($ticketsCreate);
 
         return redirect('/support/agent');
     }
@@ -150,12 +137,10 @@ $this->tickets->createTickets($ticketsCreate);
      */
     public function sendMessage(Request $request)
     {
-        if (!$this->checkAuth->checkAuth()) {
-    abort(403, 'Доступ запрещён');
-}
+
         $ticketId = (int) $request->input('ticket_id', 0);
 
-        $messageText = trim($request->input('message', '')); 
+        $messageText = trim($request->input('message', ''));
         $filePath = null;
 
         if ($request->hasFile('chat_file')) {
@@ -165,7 +150,8 @@ $this->tickets->createTickets($ticketsCreate);
             }
         }
 
-        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath);
+        $msgRole = $request->session()->get('role');
+        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath, $msgRole);
 
         return redirect('/support/agent?id='.$ticketId);
     }

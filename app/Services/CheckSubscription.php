@@ -1,24 +1,30 @@
 <?php
+
 namespace App\Services;
+
 use App\Models\Subscription;
-class checkSubscription {
-    public function checkSubscription(int $userId) {
+
+class checkSubscription
+{
+    public function checkSubscription(int $userId)
+    {
         $subscription = Subscription::where('user_id', $userId)->first();
-        if (!$subscription) {
+        if (! $subscription) {
             return [
-            'text' => 'Подписка не найдена',
-            'type' => 'info',
+                'text' => 'Подписка не найдена',
+                'type' => 'info',
             ];
-    }
- return match ($subscription->status) {
+        }
+
+        return match ($subscription->status) {
             'active' => [
                 'text' => $this->buildActiveText($subscription),
                 'type' => 'success',
             ],
             'pending' => [
                 'text' => 'Попытка оформления подписки '
-                    . $subscription->created_at->format('d.m.Y H:i')
-                    . ', но не завершилась успехом',
+                    .$subscription->created_at->format('d.m.Y H:i')
+                    .', но не завершилась успехом',
                 'type' => 'warning',
             ],
             'canceled' => [
@@ -32,6 +38,7 @@ class checkSubscription {
         };
 
     }
+
     protected function buildActiveText(Subscription $subscription): string
     {
         $expiresAt = $subscription->expires_at
