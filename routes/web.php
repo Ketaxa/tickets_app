@@ -9,10 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home', [
-        'user' => [
-            'name' => 'Alex',
-        ],
+    return Inertia::render('Auth', [
     ]);
 });
 Route::get('/support', [SupportController::class, 'showLoginForm']);
