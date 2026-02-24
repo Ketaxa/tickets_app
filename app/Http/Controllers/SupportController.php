@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\AuthService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SupportController extends Controller
 {
@@ -28,19 +29,30 @@ class SupportController extends Controller
      */
     public function login(Request $request)
     {
-        $login = trim($request->input('login', ''));
-        $password = $request->input('password', '');
-        $role = $request->input('role', '');
+        // $login = trim($request->input('login', ''));
+        // $password = $request->input('password', '');
+        // $role = $request->input('role', '');
 
-        if ($this->authService->attempt($login, $password, $role)) {
-            return redirect($this->authService->getRedirectUrl($role));
+        $validated = $request->validate([
+            'login' => ['required', 'string'],
+    'password' => ['required'],
+    'role' => ['required', 'in:tech,support'],
+        ]);
+
+
+        if ($this->authService->attempt($validated['login'], $validated['password'], $validated['role'])) {
+            /**
+             * return redirect($this->authService->getRedirectUrl($validated['role'])); 
+             * Временно для blade, пока redirect через Inertia
+             */
+            return Inertia::location($this->authService->getRedirectUrl($validated['role']));
 
         }
 
         /**
          * При ошибке авторизации
          */
-        return back()->withErrors(['Неверный логин или пароль'])->withInput();
+        return back()->withErrors(['login' => 'Неверный логин или пароль'])->withInput();
 
     }
 }

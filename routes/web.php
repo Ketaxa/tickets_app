@@ -12,6 +12,8 @@ Route::get('/', function () {
     return Inertia::render('Auth', [
     ]);
 });
+Route::post('/', [SupportController::class, 'login']);
+
 Route::get('/support', [SupportController::class, 'showLoginForm']);
 Route::post('/support', [SupportController::class, 'login']);
 

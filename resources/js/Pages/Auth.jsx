@@ -1,18 +1,11 @@
 import styles from "./Auth.module.css";
-import { useForm } from "@inertiajs/react";
+import { Form, usePage } from "@inertiajs/react";
 
 export default function Auth() {
-    const { data, setData, post, processing, errors } = useForm({
-        login: "",
-        password: "",
-    });
-    const submit = (e) => {
-        e.preventDefault();
-        post("/login");
-    };
+    const { errors } = usePage().props;
     return (
         <div className={styles.container}>
-            <form className={styles.formBlock} onSubmit={submit}>
+            <Form className={styles.formBlock} method="post" action="/support">
                 <div className={styles.pic_div}>
                     <img
                         src="images/sova.png"
@@ -20,6 +13,7 @@ export default function Auth() {
                         className={styles.sova_pic}
                     />
                 </div>
+                {errors.login && <div>{errors.login}</div>}
                 <div className={styles.input_field}>
                     <label for="login" className={styles.label}>
                         Логин
@@ -28,8 +22,8 @@ export default function Auth() {
                         type="text"
                         id="login"
                         name="login"
-                        value=""
                         className={styles.input}
+                        required
                     />
                 </div>
                 <div className={styles.input_field}>
@@ -41,17 +35,28 @@ export default function Auth() {
                         id="password"
                         name="password"
                         className={styles.input}
+                        required
                     />
                 </div>
                 <div className={styles.button_bar}>
-                    <button type="submit" className={styles.sub_button_tech}>
+                    <button
+                        type="submit"
+                        className={styles.sub_button_tech}
+                        name="role"
+                        value="tech"
+                    >
                         Войти как технический специалист
                     </button>
-                    <button type="submit" className={styles.sub_button_agent}>
+                    <button
+                        type="submit"
+                        className={styles.sub_button_agent}
+                        name="role"
+                        value="support"
+                    >
                         Войти как сотрудник поддержки
                     </button>
                 </div>
-            </form>
+            </Form>
         </div>
     );
 }
