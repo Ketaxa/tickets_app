@@ -37,7 +37,7 @@ class AuthService
     public function getRedirectUrl(string $role): string
     {
         return $role === 'support'
-            ? '/support/agent'
+            ? '/agent'
             : '/support/tech';
     }
 }

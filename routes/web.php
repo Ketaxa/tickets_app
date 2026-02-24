@@ -14,6 +14,11 @@ Route::get('/', function () {
 });
 Route::post('/', [SupportController::class, 'login']);
 
+Route::get('/agent', function () {
+    return Inertia::render('AgentPage', [SupportAgentController::class, 'index'
+    ]);
+});
+
 Route::get('/support', [SupportController::class, 'showLoginForm']);
 Route::post('/support', [SupportController::class, 'login']);
 

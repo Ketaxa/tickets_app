@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Ticket;
+use Inertia\Inertia;
 
 class TicketService
 {
@@ -15,6 +16,9 @@ class TicketService
         string $tab,
         string $sort)
     {
+        /**
+         * Рабочий запрос для блейдов, не ломать!
+         */
         $tickets = Ticket::query()
             ->when($tab === 'archive', fn ($q) => $q->where('status', 'closed'))
             ->when($tab !== 'archive', fn ($q) => $q->whereIn('status', ['new', 'answered']))
@@ -27,15 +31,14 @@ class TicketService
                     }
                 });
             });
-        // $statuses = $tab === 'archive' ? ['closed'] : ['new', 'answered'];
-        // $tickets = Ticket::query()
-        //     ->whereIn('status', $statuses)
-        //     ->when($search, fn ($q) => is_numeric($search)
-        //             ? $q->whereKey((int) $search)
-        //             : $q->where('user_id_or_email', 'like', "%{$search}%")
-        //     );
+
+        // $tickets = Ticket::all();
         /**
          * Ф-я сортировки
+         */
+
+        /**
+         * Рабочая сортировка для блейдов, не ломать!
          */
         if ($sort === 'date') {
             $tickets = $tickets->orderBy('created_at', 'desc');
@@ -45,6 +48,10 @@ class TicketService
         }
 
         return $tickets->get();
+
+        // return Inertia::render('/agent', [
+        //     'tickets' => $tickets
+        // ]);
     }
 
     /**
