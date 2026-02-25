@@ -1,5 +1,5 @@
 .modal {
-    display: none;
+    /* display: none; */
     position: fixed;
     top: 0;
     left: 0;
@@ -8,4 +8,37 @@
     background: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
+}
+.modalContent {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.input,
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+.result {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid;
+    border-color: #c3e6cb;
+}
+.button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
 }

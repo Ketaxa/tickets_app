@@ -14,10 +14,14 @@ Route::get('/', function () {
 });
 Route::post('/', [SupportController::class, 'login']);
 
-Route::get('/agent', function () {
-    return Inertia::render('AgentPage', [SupportAgentController::class, 'index'
-    ]);
+Route::middleware(['web', SupportAgentAuth::class])->group(function () {
+Route::get('/agent', [SupportAgentController::class, 'index']);
+Route::post('/agent/create', [SupportAgentController::class, 'createTicket'])->name('agent.create');
+Route::post('/agent/check', [SupportAgentController::class, 'checkSubscription']);
+
 });
+Route::get('/logout', [SupportController::class, 'logout']);
+
 
 Route::get('/support', [SupportController::class, 'showLoginForm']);
 Route::post('/support', [SupportController::class, 'login']);

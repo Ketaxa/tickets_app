@@ -1,4 +1,5 @@
 import styles from "./AgentNav.module.css";
+import { Link } from "@inertiajs/react";
 export default function AgentNav({ openModalTicket, openModalSubscription }) {
     return (
         <>
@@ -8,7 +9,6 @@ export default function AgentNav({ openModalTicket, openModalSubscription }) {
                     <button
                         className={`${styles.button} ${styles.buttonBlue}`}
                         onClick={openModalTicket}
-                        // onClick=""
                     >
                         ➕ Создать тикет
                     </button>
@@ -18,13 +18,12 @@ export default function AgentNav({ openModalTicket, openModalSubscription }) {
                     >
                         ✅ Проверить подписку
                     </button>
-                    <button
+                    <Link
                         className={`${styles.button} ${styles.buttonRed}`}
-                        // onClick=""
-                        href="/support"
+                        href="/logout"
                     >
                         Выход
-                    </button>
+                    </Link>
                 </div>
             </div>
         </>

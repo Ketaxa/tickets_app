@@ -55,4 +55,14 @@ class SupportController extends Controller
         return back()->withErrors(['login' => 'Неверный логин или пароль'])->withInput();
 
     }
+
+        /**
+     * Функция разлогирования при выходе
+     */
+    public function logout(Request $request)
+    {
+        $this->authService->logoutSession($request);
+
+        return Inertia::location(url('/'));
+    }
 }

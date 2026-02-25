@@ -4,8 +4,12 @@ import SearchTickets from "../Components/SearchTickets";
 import TableTickets from "../Components/TableTickets";
 import CreateTicket from "../Components/CreateTicket";
 import ModalSubscription from "../Components/ModalSubscription";
+import { usePage } from "@inertiajs/react";
 import { useState } from "react";
+
 export default function SupportLayout({ children }) {
+    const { props } = usePage();
+    const { tickets } = props;
     const [modalTicket, setModalTicket] = useState(false);
     const [modalSubscription, setModalSubscription] = useState(false);
     const openModalTicket = () => {
@@ -18,7 +22,6 @@ export default function SupportLayout({ children }) {
         setModalTicket(false);
         setModalSubscription(false);
     };
-    console.log(modalSubscription);
 
     return (
         <div className={styles.container}>
@@ -27,7 +30,7 @@ export default function SupportLayout({ children }) {
                 openModalSubscription={openModalSubscription}
             />
             <SearchTickets />
-            <TableTickets />
+            <TableTickets tickets={tickets} />
             {modalTicket && (
                 <CreateTicket closeModalTicket={closeModalTicket} />
             )}

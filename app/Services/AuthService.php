@@ -40,4 +40,12 @@ class AuthService
             ? '/agent'
             : '/support/tech';
     }
+
+        /**
+     * Очистка сессии 
+     */
+    public function logoutSession($request) {
+        $request->session()->invalidate();
+        Session::forget(['logged_in', 'role']);
+    }
 }

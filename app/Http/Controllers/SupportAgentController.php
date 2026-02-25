@@ -44,7 +44,15 @@ class SupportAgentController extends Controller
         $currentTicket = $ticketId ? Ticket::find($ticketId) : null;
         $chatMessages = $currentTicket ? json_decode($currentTicket->chat_messages ?? '[]', true) : [];
 
-        return view('support.agent', compact('tickets', 'currentTicket', 'chatMessages', 'tab', 'sort', 'search'));
+        return inertia('AgentPage', [
+    'tickets' => $tickets,
+    'currentTicket' => $currentTicket,
+    'chatMessages' => $chatMessages,
+    'tab' => $tab,
+    'sort' => $sort,
+    'search' => $search,
+]);
+        // return view('support.agent', compact('tickets', 'currentTicket', 'chatMessages', 'tab', 'sort', 'search'));
     }
 
     /**
@@ -69,13 +77,11 @@ class SupportAgentController extends Controller
         /**
          * Вывод результата
          */
-        return redirect()->back()
-            ->withInput()
-            ->with([
-                'subscription_result_text' => $resultSubscribes['text'],
-                'subscription_result_type' => $resultSubscribes['type'],
-                'open_sub_modal' => true,
-            ]);
+    return redirect()->back()->with([
+    'subscription_result_text' => $resultSubscribes['text'],
+    'subscription_result_type' => $resultSubscribes['type'],
+    // 'open_sub_modal' => true,
+]);
     }
 
     /**
@@ -129,7 +135,7 @@ class SupportAgentController extends Controller
 
         $this->tickets->createTickets($ticketsCreate);
 
-        return redirect('/support/agent');
+        return redirect('/agent');
     }
 
     /**
