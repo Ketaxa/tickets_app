@@ -19,64 +19,93 @@ class SupportTechController extends Controller
     ) {}
 
     public function index(Request $request)
-    {
-        $search = trim($request->query('search', ''));
-        $tab = $request->query('tab', 'active');
-        $sort = $request->query('sort', 'answered');
+{
+    $search = trim($request->query('search', ''));
+    $tab = $request->query('tab', 'active');
+    $sort = $request->query('sort', 'answered');
 
-        $tickets = Ticket::query()
-            ->when($tab === 'archive',
-                fn ($q) => $q->where('status', 'closed'),
-                fn ($q) => $q->whereIn('status', ['new', 'answered'])
-            )
-            ->when($search !== '',
-                fn ($q) => $q->where(function ($qq) use ($search) {
-                    $qq->where('user_id_or_email', 'like', "%$search%")
-                        ->orWhere('id', 'like', "%$search%");
-                })
-            )
-            ->orderByRaw(
-                $sort === 'date'
-                ? 'created_at DESC'
-                : "FIELD(status,'answered') ASC, created_at DESC"
-            )
-            ->get();
+    $tickets = Ticket::query()
+        ->when($tab === 'archive',
+            fn ($q) => $q->where('status', 'closed'),
+            fn ($q) => $q->whereIn('status', ['new', 'answered'])
+        )
+        ->when($search !== '',
+            fn ($q) => $q->where(function ($qq) use ($search) {
+                $qq->where('user_id_or_email', 'like', "%$search%")
+                   ->orWhere('id', 'like', "%$search%");
+            })
+        )
+        ->orderByRaw(
+            $sort === 'date'
+            ? 'created_at DESC'
+            : "FIELD(status,'answered') ASC, created_at DESC"
+        )
+        ->get();
 
-        $current_ticket = null;
+    $currentTicket = $request->has('id') ? Ticket::find($request->id) : null;
+    $chatMessages = $currentTicket ? json_decode($currentTicket->chat_messages ?? '[]', true) ?? [] : [];
 
-        if ($request->has('id')) {
-            $current_ticket = Ticket::find($request->id);
-        }
+    return inertia('TechPage', [
+        'tickets' => $tickets,
+        'currentTicket' => $currentTicket,
+        'chatMessages' => $chatMessages,
+        'tab' => $tab,
+        'sort' => $sort,
+        'search' => $search,
+        'baseUrl' => '/tech',
+    ]);
+}
+//     public function index(Request $request)
+//     {
+//         $search = trim($request->query('search', ''));
+//         $tab = $request->query('tab', 'active');
+//         $sort = $request->query('sort', 'answered');
 
-        $current_ticket = Ticket::find($request->id);
-        $chatMessages = [];
+//         $tickets = Ticket::query()
+//             ->when($tab === 'archive',
+//                 fn ($q) => $q->where('status', 'closed'),
+//                 fn ($q) => $q->whereIn('status', ['new', 'answered'])
+//             )
+//             ->when($search !== '',
+//                 fn ($q) => $q->where(function ($qq) use ($search) {
+//                     $qq->where('user_id_or_email', 'like', "%$search%")
+//                         ->orWhere('id', 'like', "%$search%");
+//                 })
+//             )
+//             ->orderByRaw(
+//                 $sort === 'date'
+//                 ? 'created_at DESC'
+//                 : "FIELD(status,'answered') ASC, created_at DESC"
+//             )
+//             ->get();
 
-        if ($current_ticket) {
-            $chatMessages = json_decode($current_ticket->chat_messages ?? '[]', true);
-            if (! is_array($chatMessages)) {
-                $chatMessages = [];
-            }
-        }
+//         $current_ticket = null;
 
-                return inertia('TechPage', [
-    'tickets' => $tickets,
-    'currentTicket' => $current_ticket,
-    'chatMessages' => $chatMessages,
-    'tab' => $tab,
-    'sort' => $sort,
-    'search' => $search,
-    'baseUrl' => '/tech',
-]);
-        // return view('support.tech', compact(
-        //     'tickets',
-        //     'current_ticket',
-        //     'chatMessages',
-        //     'search',
-        //     'tab',
-        //     'sort'
-        // ));
+//         if ($request->has('id')) {
+//             $current_ticket = Ticket::find($request->id);
+//         }
 
-    }
+//         $current_ticket = Ticket::find($request->id);
+//         $chatMessages = [];
+
+//         if ($current_ticket) {
+//             $chatMessages = json_decode($current_ticket->chat_messages ?? '[]', true);
+//             if (! is_array($chatMessages)) {
+//                 $chatMessages = [];
+//             }
+//         }
+
+//                 return inertia('TechPage', [
+//     'tickets' => $tickets,
+//     'currentTicket' => $current_ticket,
+//     'chatMessages' => $chatMessages,
+//     'tab' => $tab,
+//     'sort' => $sort,
+//     'search' => $search,
+//     'baseUrl' => '/tech',
+// ]);
+
+//     }
 
     /**
      * Ф-я отправки сообщений
