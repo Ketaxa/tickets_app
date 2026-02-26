@@ -32,7 +32,6 @@ class TicketService
                 });
             });
 
-        // $tickets = Ticket::all();
         /**
          * Ф-я сортировки
          */
@@ -48,10 +47,6 @@ class TicketService
         }
 
         return $tickets->get();
-
-        // return Inertia::render('/agent', [
-        //     'tickets' => $tickets
-        // ]);
     }
 
     /**

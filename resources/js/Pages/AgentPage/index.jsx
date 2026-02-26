@@ -1,10 +1,9 @@
-import styles from "./AgentPage.module.css";
-import SupportLayout from "../../Layouts/SupportLayout";
-import CreateTicket from "../../Components/CreateTicket";
-export default function AgentPage() {
+import SupportLayout from "../../Layouts/SupportLayout/SupportLayout";
+
+export default function AgentPage({ baseUrl = { baseUrl } }) {
     return (
         <>
-            <SupportLayout></SupportLayout>
+            <SupportLayout baseUrl={baseUrl}></SupportLayout>
         </>
     );
 }

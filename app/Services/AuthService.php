@@ -38,7 +38,7 @@ class AuthService
     {
         return $role === 'support'
             ? '/agent'
-            : '/support/tech';
+            : '/tech';
     }
 
         /**

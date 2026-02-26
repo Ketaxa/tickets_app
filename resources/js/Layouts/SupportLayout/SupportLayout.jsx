@@ -1,15 +1,15 @@
 import styles from "./SupportLayout.module.css";
-import AgentNav from "../Components/AgentNav";
-import SearchTickets from "../Components/SearchTickets";
-import TableTickets from "../Components/TableTickets";
-import CreateTicket from "../Components/CreateTicket";
-import ModalSubscription from "../Components/ModalSubscription";
+import AgentNav from "../../Components/AgentNav";
+import SearchTickets from "../../Components/SearchTickets";
+import TableTickets from "../../Components/TableTickets";
+import CreateTicket from "../../Components/CreateTicket";
+import ModalSubscription from "../../Components/ModalSubscription";
 import { usePage } from "@inertiajs/react";
 import { useState } from "react";
 
-export default function SupportLayout({ children }) {
+export default function SupportLayout({ children, baseUrl }) {
     const { props } = usePage();
-    const { tickets } = props;
+    const { tickets, tab, sort } = props;
     const [modalTicket, setModalTicket] = useState(false);
     const [modalSubscription, setModalSubscription] = useState(false);
     const openModalTicket = () => {
@@ -29,8 +29,8 @@ export default function SupportLayout({ children }) {
                 openModalTicket={openModalTicket}
                 openModalSubscription={openModalSubscription}
             />
-            <SearchTickets />
-            <TableTickets tickets={tickets} />
+            <SearchTickets tab={tab} sort={sort} baseUrl={baseUrl} />
+            <TableTickets tickets={tickets} baseUrl={baseUrl} />
             {modalTicket && (
                 <CreateTicket closeModalTicket={closeModalTicket} />
             )}

@@ -1,29 +1,63 @@
+import { useState } from "react";
+import { Form, router } from "@inertiajs/react";
+
 import styles from "./SearchTickets.module.css";
-export default function SearchTickets() {
+export default function SearchTickets({ search, sort, tab, baseUrl }) {
+    const [searchValue, setSearchValue] = useState("");
+    const menuItems = [
+        { label: "Answered first", value: "answered" },
+        { label: "По дате", value: "date" },
+        { label: "📁 Архив", value: "archive" },
+    ];
+    const handleSort = (value) => {
+        if (value === "archive") {
+            router.get(baseUrl, {
+                tab: "archive",
+                sort: value,
+            });
+        } else {
+            router.get(baseUrl, {
+                tab: "active",
+                sort: value,
+            });
+        }
+    };
     return (
         <div className={styles.container}>
-            <input
-                type="text"
-                id="search"
-                placeholder="Поиск по ID или email"
-                className={styles.input}
-                // value=""
-            />
-            <button
-                // onClick=""
-                className={`${styles.button} ${styles.buttonGray}`}
-            >
-                Найти
-            </button>
-            <div className={styles.button_bar}>
+            <Form method="GET" action={baseUrl}>
+                <input
+                    type="text"
+                    id="search"
+                    placeholder="Поиск по ID или email"
+                    className={styles.input}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    value={searchValue}
+                    name="search"
+                    required
+                />
+                <input type="hidden" name="sort" value={sort} />
+                <input type="hidden" name="tab" value={tab} />
                 <button
-                    // className="{{ ($tab === 'active' && $sort === 'answered') ? 'bg-blue-500 text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200' }} px-6 py-3 rounded-xl font-semibold transition-all"
-                    className={styles.bar_btn}
+                    className={`${styles.button} ${styles.buttonGray}`}
+                    type="submit"
                 >
-                    Answered first
+                    Найти
                 </button>
-                <button className={styles.bar_btn}>По дате</button>
-                <button className={styles.bar_btn}>📁 Архив</button>
+            </Form>
+            <div className={styles.button_bar}>
+                {menuItems.map((item) => {
+                    return (
+                        <button
+                            key={item.value}
+                            onClick={() => handleSort(item.value)}
+                            className={`${styles.bar_btn} ${
+                                sort === item.value ? styles.buttonActive : ""
+                            }`}
+                        >
+                            {item.label}
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );

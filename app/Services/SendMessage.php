@@ -10,7 +10,7 @@ class SendMessage
     {
         $ticket = Ticket::find($ticketId);
         if (! $ticket) {
-            abort(404, 'Тикет не найден');
+            return response()->json(['error' => 'Нет тикета'],404);
         }
         $chatMessages = json_decode($ticket->chat_messages ?? '[]', true);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use App\Models\Ticket;
 // use App\Services\CheckAuth;
 use App\Services\CheckSubscription;
@@ -51,8 +52,8 @@ class SupportAgentController extends Controller
     'tab' => $tab,
     'sort' => $sort,
     'search' => $search,
+        'baseUrl' => '/agent',
 ]);
-        // return view('support.agent', compact('tickets', 'currentTicket', 'chatMessages', 'tab', 'sort', 'search'));
     }
 
     /**
@@ -92,7 +93,7 @@ class SupportAgentController extends Controller
         $ticketId = $request->input('ticket_id');
         $this->controlTicketsStatus->closeTicket($ticketId);
 
-        return redirect()->route('support.agent');
+        return redirect()->route('agent');
     }
 
     /**
@@ -152,13 +153,35 @@ class SupportAgentController extends Controller
         if ($request->hasFile('chat_file')) {
             $file = $request->file('chat_file');
             if (in_array($file->getClientOriginalExtension(), $this->allowedFileExt, true)) {
-                $filePath = $file->store('uploads', 'public');
+                $path = $file->store('uploads', 'public');
+                $filePath = Storage::disk('public')->url($path) ;
+                // $filePath = $path;
+
             }
         }
 
         $msgRole = $request->session()->get('role');
         $this->sendMessage->sendMessage($ticketId, $messageText, $filePath, $msgRole);
+        return redirect()->route('agent.message', ['ticket_id' => $ticketId]);
 
-        return redirect('/support/agent?id='.$ticketId);
+    }
+
+    /**
+     * Ф-я получения диалога тикета
+     */
+    public function showMessage(Request $request)
+    {
+        $ticketId = (int) $request->query('ticket_id', 0);
+        $ticket = Ticket::find($ticketId);
+        if (!$ticket) {
+            abort(404);
+        }
+        $chatMessages = json_decode($ticket->chat_messages ?? '[]', true);
+        return inertia('AgentDialogue', [
+    'ticket' => $ticket,
+    'initialMessages' => $chatMessages,
+        'baseUrl' => '/agent',
+
+]);
     }
 }

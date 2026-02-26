@@ -58,14 +58,23 @@ class SupportTechController extends Controller
             }
         }
 
-        return view('support.tech', compact(
-            'tickets',
-            'current_ticket',
-            'chatMessages',
-            'search',
-            'tab',
-            'sort'
-        ));
+                return inertia('TechPage', [
+    'tickets' => $tickets,
+    'currentTicket' => $current_ticket,
+    'chatMessages' => $chatMessages,
+    'tab' => $tab,
+    'sort' => $sort,
+    'search' => $search,
+    'baseUrl' => '/tech',
+]);
+        // return view('support.tech', compact(
+        //     'tickets',
+        //     'current_ticket',
+        //     'chatMessages',
+        //     'search',
+        //     'tab',
+        //     'sort'
+        // ));
 
     }
 
@@ -89,28 +98,46 @@ class SupportTechController extends Controller
 
         $msgRole = $request->session()->get('role');
         $this->sendMessage->sendMessage($ticketId, $messageText, $filePath, $msgRole);
+        return redirect()->route('tech.message', ['ticket_id' => $ticketId]);
 
-        return redirect('/support/tech?id='.$ticketId);
+        // return redirect('/support/tech?id='.$ticketId);
     }
 
     /**
      * Ф-я закрытия тикета
      */
-    public function close($id)
+    public function close(Request $request)
     {
-        $this->controlTicketsStatus->closeTicket($id);
+        $ticketId = $request->input('ticket_id');
+        $this->controlTicketsStatus->closeTicket($ticketId);
 
-        return redirect()->route('support.tech');
+        return redirect()->route('tech');
     }
 
     /**
      * Ф-я открытия тикета
      */
-    public function reopen($id)
+    public function reopen(Request $request)
     {
 
-        $this->controlTicketsStatus->reopenTicket($id);
+        $ticketId = $request->input('ticket_id');
+        $this->controlTicketsStatus->reopenTicket($ticketId);
 
         return redirect()->back();
+    }
+
+        public function showMessage(Request $request)
+    {
+        $ticketId = (int) $request->query('ticket_id', 0);
+        $ticket = Ticket::find($ticketId);
+        if (!$ticket) {
+            abort(404);
+        }
+        $chatMessages = json_decode($ticket->chat_messages ?? '[]', true);
+        return inertia('TechDialogue', [
+    'ticket' => $ticket,
+    'initialMessages' => $chatMessages,
+    'baseUrl' => '/tech',
+]);
     }
 }
