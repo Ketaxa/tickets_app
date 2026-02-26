@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Form, router } from "@inertiajs/react";
 
 import styles from "./SearchTickets.module.css";
-export default function SearchTickets({ search, sort, tab, baseUrl }) {
+export default function SearchTickets({ sort, tab, baseUrl }) {
     const [searchValue, setSearchValue] = useState("");
     const menuItems = [
-        { label: "Answered first", value: "answered" },
+        { label: "Ответы", value: "answered" },
         { label: "По дате", value: "date" },
-        { label: "📁 Архив", value: "archive" },
+        { label: "Архив", value: "archive" },
     ];
     const handleSort = (value) => {
         if (value === "archive") {
@@ -51,7 +51,9 @@ export default function SearchTickets({ search, sort, tab, baseUrl }) {
                             key={item.value}
                             onClick={() => handleSort(item.value)}
                             className={`${styles.bar_btn} ${
-                                sort === item.value ? styles.buttonActive : ""
+                                sort === item.value
+                                    ? styles.buttonActive
+                                    : styles.buttonUnactive
                             }`}
                         >
                             {item.label}

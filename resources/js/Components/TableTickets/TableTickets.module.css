@@ -2,14 +2,21 @@
     width: 100%;
     border-collapse: collapse;
     background: white;
+    border: 2px solid #ebe1fa;
+    border-radius: 15px;
+    margin: 50px 0;
 }
 .table th,
 .table td {
     padding: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #ebe1fa;
     text-align: left;
     cursor: pointer;
+    border-radius: 10px;
+}
+.table tr {
+    transition: background-color 0.5s ease;
 }
 .table tr:hover {
-    background-color: #ff9e9e;
+    background-color: #efe4fe;
 }
