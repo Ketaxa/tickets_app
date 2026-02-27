@@ -1,16 +1,18 @@
 import styles from "./AgentNav.module.css";
+// import Plus from "../../../../public/images/icons/Plus";
 import { Link } from "@inertiajs/react";
 export default function AgentNav({ openModalTicket, openModalSubscription }) {
     return (
         <>
             <div className={styles.container}>
                 <h1>Панель поддержки</h1>
-                <div>
+                <div className={styles.btnBar}>
                     <button
                         className={`${styles.button} ${styles.buttonBlue}`}
                         onClick={openModalTicket}
                     >
-                        ➕ Создать тикет
+                        {/* <Plus /> */}
+                        Создать тикет
                     </button>
                     <button
                         className={`${styles.button} ${styles.buttonGreen}`}

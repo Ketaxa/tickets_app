@@ -13,25 +13,10 @@ class SupportController extends Controller
     ) {}
 
     /**
-     * Показать форму логина
-     */
-    public function showLoginForm()
-    {
-
-        /**
-         *Blade-страница регистрации
-         */
-        return view('support.login');
-    }
-
-    /**
      * Обработка POST-запроса логина
      */
     public function login(Request $request)
     {
-        // $login = trim($request->input('login', ''));
-        // $password = $request->input('password', '');
-        // $role = $request->input('role', '');
 
         $validated = $request->validate([
             'login' => ['required', 'string'],
@@ -41,10 +26,7 @@ class SupportController extends Controller
 
 
         if ($this->authService->attempt($validated['login'], $validated['password'], $validated['role'])) {
-            /**
-             * return redirect($this->authService->getRedirectUrl($validated['role'])); 
-             * Временно для blade, пока redirect через Inertia
-             */
+
             return Inertia::location($this->authService->getRedirectUrl($validated['role']));
 
         }

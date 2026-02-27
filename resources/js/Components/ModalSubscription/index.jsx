@@ -1,7 +1,9 @@
 import styles from "./ModalSubscription.module.css";
 import { Form, usePage } from "@inertiajs/react";
-export default function ModalSubscription({ closeModalTicket }) {
-    const { flash } = usePage().props;
+export default function ModalSubscription({ closeModalTicket, removeFlash }) {
+    // const { flash } = usePage().props;
+    console.log(removeFlash?.subscription_result_text);
+
     return (
         <>
             <div className={styles.modal}>
@@ -17,10 +19,13 @@ export default function ModalSubscription({ closeModalTicket }) {
                             className={styles.input}
                             required
                         ></input>
-                        <div className={styles.result}>
-                            {flash.subscription_result_text}
-                            {/* {flash.subscription_result_type} Это для отображения цвета */}
-                        </div>
+                        {removeFlash?.subscription_result_text && (
+                            <div className={styles.result}>
+                                {removeFlash.subscription_result_text}
+                                {/* {flash.subscription_result_type} Это для отображения цвета */}
+                            </div>
+                        )}
+
                         <div className={styles.button_bar}>
                             <button
                                 type="button"

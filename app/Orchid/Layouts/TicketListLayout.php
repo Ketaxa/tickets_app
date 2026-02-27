@@ -4,6 +4,7 @@ namespace App\Orchid\Layouts;
 
 use Orchid\Screen\Layouts\Table;
 use Orchid\Screen\TD;
+use Orchid\Screen\Fields\Input;
 
 class TicketListLayout extends Table
 {
@@ -18,13 +19,13 @@ class TicketListLayout extends Table
     protected function columns(): iterable
     {
         return [
-            TD::make('id', 'ID'),
+            TD::make('id', 'ID')->sort(),
 
-            TD::make('user_id_or_email', 'Клиент'),
+            TD::make('user_id_or_email', 'Клиент')->sort()->filter(Input::make()),
 
-            TD::make('short_desc', 'Краткое описание'),
+            TD::make('short_desc', 'Краткое описание')->sort(),
 
-            TD::make('status', 'Статус'),
+            TD::make('status', 'Статус')->sort(),
 
             TD::make('created_at', 'Дата создания')
                 ->render(function ($ticket) {

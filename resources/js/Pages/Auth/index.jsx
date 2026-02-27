@@ -5,7 +5,7 @@ export default function Auth() {
     const { errors } = usePage().props;
     return (
         <div className={styles.container}>
-            <Form className={styles.formBlock} method="post" action="/support">
+            <Form className={styles.formBlock} method="post" action="/">
                 <div className={styles.pic_div}>
                     <img
                         src="images/sova.png"

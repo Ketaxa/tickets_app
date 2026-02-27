@@ -11,7 +11,6 @@ export default defineConfig({
         }),
         tailwindcss(),
         react(),
-        // wayfinder(),
     ],
     server: {
         watch: {

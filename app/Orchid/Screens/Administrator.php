@@ -16,8 +16,10 @@ class Administrator extends Screen
     public function query(): array
     {
         return [
-            'tickets' => Ticket::paginate(15),
-        ];
+        'tickets' => Ticket::filters()
+            ->defaultSort('id')
+            ->paginate(15),
+    ];
     }
 
     public function layout(): array

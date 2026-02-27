@@ -7,8 +7,13 @@ import { usePage } from "@inertiajs/react";
 import { useState } from "react";
 
 export default function DialogueLayout({ children, baseUrl }) {
-    const { ticket, initialMessages } = usePage().props;
-
+    const { ticket, initialMessages, flash } = usePage().props;
+    const [removeFlash, setRemoveFlash] = useState(
+        flash || {
+            subscription_result_text: null,
+            subscription_result_type: null,
+        },
+    );
     const [modalTicket, setModalTicket] = useState(false);
     const [modalSubscription, setModalSubscription] = useState(false);
     const openModalTicket = () => {
@@ -20,6 +25,10 @@ export default function DialogueLayout({ children, baseUrl }) {
     const closeModalTicket = () => {
         setModalTicket(false);
         setModalSubscription(false);
+        setRemoveFlash({
+            subscription_result_text: null,
+            subscription_result_type: null,
+        });
     };
 
     return (
@@ -38,7 +47,10 @@ export default function DialogueLayout({ children, baseUrl }) {
                 <CreateTicket closeModalTicket={closeModalTicket} />
             )}
             {modalSubscription && (
-                <ModalSubscription closeModalTicket={closeModalTicket} />
+                <ModalSubscription
+                    closeModalTicket={closeModalTicket}
+                    removeFlash={removeFlash}
+                />
             )}
             {children}
         </div>

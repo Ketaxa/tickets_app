@@ -31,6 +31,11 @@ export default function CreateTicket({ closeModalTicket }) {
                         className={styles.input}
                         required
                     />
+                    <label className={styles.customFileUpload}>
+                        Выбор файла
+                        <input type="file" name="file" />
+                    </label>
+
                     <div className={styles.btn_bar}>
                         <button
                             type="button"
