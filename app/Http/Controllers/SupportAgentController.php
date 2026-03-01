@@ -153,7 +153,7 @@ class SupportAgentController extends Controller
             $file = $request->file('chat_file');
             if (in_array($file->getClientOriginalExtension(), $this->allowedFileExt, true)) {
                 $path = $file->store('uploads', 'public');
-                $filePath = Storage::disk('public')->url($path) ;
+                $filePath = '/storage/' . $path;
 
             }
         }
