@@ -62,4 +62,4 @@ Route::post('/telegram/webhook', function(Request $request) {
     }
 
     return response()->json(['ok' => true]);
-});
+})->withoutMiddleware(['web']);
