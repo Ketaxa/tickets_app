@@ -14,13 +14,13 @@ export default function DialogueField({
         <div className={styles.ticketCard}>
             <div className={styles.ticketHeader}>
                 <div>
-                    <strong>#ID - {ticket.id}</strong> —
+                    <strong> #ID - {ticket.id}</strong> —
                     {ticket.user_id_or_email}
                     <span className={styles.badge}>Ожидает ответа</span>
                 </div>
-                <div>
+                <div className={styles.btn_bar}>
                     <button
-                        className={`${styles.button} ${styles.buttonGray}`}
+                        className={`${styles.button} ${styles.buttonGreen}`}
                         onClick={() => {
                             router.post(
                                 ticket.status === "closed"
@@ -43,10 +43,7 @@ export default function DialogueField({
                 </div>
             </div>
 
-            <div
-                className={styles.ticketBody}
-                style={{ maxHeight: "400px", overflowY: "auto" }}
-            >
+            <div className={styles.ticketBody}>
                 {initialMessages.map((item) => {
                     return (
                         <div
