@@ -1,11 +1,15 @@
 import styles from "./DialogueField.module.css";
 import { router, Form } from "@inertiajs/react";
 
-export default function DialogueField({ ticket, initialMessages, baseUrl }) {
+export default function DialogueField({
+    ticket,
+    initialMessages,
+    baseUrl,
+    role,
+}) {
     if (!ticket) {
         return <p>Тикет не найден</p>;
     }
-    console.log(initialMessages);
     return (
         <div className={styles.ticketCard}>
             <div className={styles.ticketHeader}>
@@ -43,27 +47,35 @@ export default function DialogueField({ ticket, initialMessages, baseUrl }) {
                 className={styles.ticketBody}
                 style={{ maxHeight: "400px", overflowY: "auto" }}
             >
-                {initialMessages.map((item) => (
-                    <div
-                        key={item.id}
-                        className={`${styles.chatBubble} ${item.role === "support" ? styles.chatSupport : styles.chatTech}`}
-                    >
-                        <div>{item.text}</div>
-                        {item.file && (
-                            <a
-                                href={`${item.file}`}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                {item.file}
-                            </a>
-                        )}
-                        <div className={styles.chatTimestamp}>
-                            {item.timestamp}
-                            {item.role}
+                {initialMessages.map((item) => {
+                    return (
+                        <div
+                            key={item.id}
+                            className={`${styles.chatBubble} ${
+                                item.role === role
+                                    ? styles.chatSupport
+                                    : styles.chatTech
+                            }`}
+                        >
+                            <div>{item.text}</div>
+
+                            {item.file && (
+                                <a
+                                    href={item.file}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    {item.file}
+                                </a>
+                            )}
+
+                            <div className={styles.chatTimestamp}>
+                                {item.timestamp}
+                                {item.role}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 <div></div>
             </div>
 

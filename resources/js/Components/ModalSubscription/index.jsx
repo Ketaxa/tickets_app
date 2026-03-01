@@ -1,8 +1,23 @@
 import styles from "./ModalSubscription.module.css";
-import { Form, usePage } from "@inertiajs/react";
-export default function ModalSubscription({ closeModalTicket, removeFlash }) {
-    // const { flash } = usePage().props;
-    console.log(removeFlash?.subscription_result_text);
+import { useEffect, useState } from "react";
+import { Form, usePage, router } from "@inertiajs/react";
+export default function ModalSubscription({ closeModalTicket }) {
+    const { flash } = usePage().props;
+    const [close, setClose] = useState(null);
+    useEffect(() => {
+        if (flash.subscription_result_text) {
+            setClose({
+                text: flash.subscription_result_text,
+                type: flash.subscription_result_type,
+            });
+        }
+    }, [flash]);
+
+    const handleClose = () => {
+        setClose(null);
+        router.reload({ only: [] });
+        closeModalTicket();
+    };
 
     return (
         <>
@@ -19,9 +34,9 @@ export default function ModalSubscription({ closeModalTicket, removeFlash }) {
                             className={styles.input}
                             required
                         ></input>
-                        {removeFlash?.subscription_result_text && (
+                        {close && (
                             <div className={styles.result}>
-                                {removeFlash.subscription_result_text}
+                                {close.text}
                                 {/* {flash.subscription_result_type} Это для отображения цвета */}
                             </div>
                         )}
@@ -30,7 +45,7 @@ export default function ModalSubscription({ closeModalTicket, removeFlash }) {
                             <button
                                 type="button"
                                 className={styles.button}
-                                onClick={closeModalTicket}
+                                onClick={handleClose}
                             >
                                 Закрыть
                             </button>

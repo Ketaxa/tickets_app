@@ -1,7 +1,14 @@
 import styles from "./CreateTicket.module.css";
+import { useState } from "react";
 import { Form } from "@inertiajs/react";
 
 export default function CreateTicket({ closeModalTicket }) {
+    const [fileName, setFileName] = useState("Файл не выбран");
+    const handleChange = (e) => {
+        if (e.target.files.length > 0) {
+            setFileName(e.target.files[0].name);
+        }
+    };
     return (
         <div className={styles.modal}>
             <div className={styles.modalContent}>
@@ -31,10 +38,17 @@ export default function CreateTicket({ closeModalTicket }) {
                         className={styles.input}
                         required
                     />
-                    <label className={styles.customFileUpload}>
-                        Выбор файла
-                        <input type="file" name="file" />
-                    </label>
+                    <div className={styles.wrapper}>
+                        <label className={styles.uploadBtn}>
+                            Выбрать файл
+                            <input
+                                type="file"
+                                name="file"
+                                onChange={handleChange}
+                            />
+                        </label>
+                        <span className={styles.fileName}>{fileName}</span>
+                    </div>
 
                     <div className={styles.btn_bar}>
                         <button

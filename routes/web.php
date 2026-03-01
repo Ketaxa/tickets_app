@@ -7,6 +7,9 @@ use App\Http\Middleware\SupportAgentAuth;
 use App\Http\Middleware\SupportTechAuth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use App\Models\TelegramSubscriber;
 
 Route::get('/', function () {
     return Inertia::render('Auth', [
@@ -40,3 +43,23 @@ Route::post('/tech/reopen', [SupportTechController::class, 'reopen'])
 });
 
 Route::get('/logout', [SupportController::class, 'logout']);
+
+Route::post('/telegram/webhook', function(Request $request) {
+    $data = $request->all();
+
+    if(isset($data['message'])) {
+        $chatId = $data['message']['chat']['id'];
+        $text = $data['message']['text'];
+
+        if ($text === '/start') {
+            TelegramSubscriber::firstOrCreate(['chat_id' => $chatId]);
+
+            Http::post("https://api.telegram.org/bot".env('TELEGRAM_BOT_TOKEN')."/sendMessage", [
+                'chat_id' => $chatId,
+                'text' => "Вы подписались на уведомления о новых тикетах!",
+            ]);
+        }
+    }
+
+    return response()->json(['ok' => true]);
+});

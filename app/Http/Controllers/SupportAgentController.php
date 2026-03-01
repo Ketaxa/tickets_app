@@ -81,7 +81,6 @@ class SupportAgentController extends Controller
     return redirect()->back()->with([
     'subscription_result_text' => $resultSubscribes['text'],
     'subscription_result_type' => $resultSubscribes['type'],
-    // 'open_sub_modal' => true,
 ]);
     }
 
@@ -159,8 +158,10 @@ class SupportAgentController extends Controller
             }
         }
 
+        $role = $request->session()->get('role');   
+
         $msgRole = $request->session()->get('role');
-        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath, $msgRole);
+        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath, $msgRole, $role);
         return redirect()->route('agent.message', ['ticket_id' => $ticketId]);
 
     }
@@ -180,6 +181,7 @@ class SupportAgentController extends Controller
     'ticket' => $ticket,
     'initialMessages' => $chatMessages,
         'baseUrl' => '/agent',
+        'role' => 'support',
 
 ]);
     }

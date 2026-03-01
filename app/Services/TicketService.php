@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Ticket;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class TicketService
 {
@@ -54,25 +55,43 @@ class TicketService
      */
     public function createTickets(array $data)
     {
+    $path = null;
+    $filePath = null;
 
-        $filePath = null;
-
-        /**
+            /**
          * Условие на наличие файла в тикете
          */
         if (! empty($data['file'])) {
             $file = $data['file'];
             if (in_array($file->getClientOriginalExtension(), $this->allowedFileExt, true)) {
-                $filePath = $file->store('uploads', 'public');
+            $path = $file->store('uploads', 'public');    
+            $filePath = Storage::disk('public')->url($path);
             }
         }
+        
+    $initialMessage = [
+    [
+        'id' => uniqid('m_', true),
+        'role' => 'support',
+        'text' => $data['full_desc'],
+        'file' => $filePath,
+        'timestamp' => now()->toDateTimeString(),
+    ]
+];
 
-        return Ticket::create([
-            'user_id_or_email' => $data['user_id_or_email'],
-            'short_desc' => $data['short_desc'],
-            'full_desc' => $data['full_desc'],
-            'file_path' => $filePath,
-            'status' => 'new',
-        ]);
+
+        $ticket = Ticket::create([
+        'user_id_or_email' => $data['user_id_or_email'],
+        'short_desc' => $data['short_desc'],
+        'full_desc' => $data['full_desc'],
+        'chat_messages' => json_encode($initialMessage, JSON_UNESCAPED_UNICODE),
+        'file_path' => $filePath,
+        'status' => 'new',
+    ]);
+
+    $message = "Новый тикет: #{$ticket->id} - {$ticket->short_desc}";
+    TelegramService::sendMessageToAll($message);
+
+    return $ticket;
     }
 }

@@ -74,8 +74,10 @@ class SupportTechController extends Controller
             }
         }
 
+        $role = $request->session()->get('role');   
+
         $msgRole = $request->session()->get('role');
-        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath, $msgRole);
+        $this->sendMessage->sendMessage($ticketId, $messageText, $filePath, $msgRole, $role);
         return redirect()->route('tech.message', ['ticket_id' => $ticketId]);
 
     }
@@ -115,6 +117,7 @@ class SupportTechController extends Controller
     'ticket' => $ticket,
     'initialMessages' => $chatMessages,
     'baseUrl' => '/tech',
+    'role' => 'tech'
 ]);
     }
 }

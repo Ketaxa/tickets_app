@@ -6,7 +6,7 @@ import ModalSubscription from "../../Components/ModalSubscription";
 import { usePage } from "@inertiajs/react";
 import { useState } from "react";
 
-export default function DialogueLayout({ children, baseUrl }) {
+export default function DialogueLayout({ children, baseUrl, role }) {
     const { ticket, initialMessages, flash } = usePage().props;
     const [removeFlash, setRemoveFlash] = useState(
         flash || {
@@ -14,6 +14,8 @@ export default function DialogueLayout({ children, baseUrl }) {
             subscription_result_type: null,
         },
     );
+    console.log(usePage().props);
+    console.log(removeFlash);
     const [modalTicket, setModalTicket] = useState(false);
     const [modalSubscription, setModalSubscription] = useState(false);
     const openModalTicket = () => {
@@ -42,6 +44,7 @@ export default function DialogueLayout({ children, baseUrl }) {
                 ticket={ticket}
                 initialMessages={initialMessages}
                 baseUrl={baseUrl}
+                role={role}
             />
             {modalTicket && (
                 <CreateTicket closeModalTicket={closeModalTicket} />

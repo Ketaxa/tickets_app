@@ -1,8 +1,8 @@
 import DialogueLayout from "../../Layouts/DialogueLayout";
-export default function AgentDialogue({ baseUrl }) {
+export default function AgentDialogue({ baseUrl, role }) {
     return (
         <>
-            <DialogueLayout baseUrl={baseUrl}></DialogueLayout>
+            <DialogueLayout baseUrl={baseUrl} role={role}></DialogueLayout>
         </>
     );
 }
