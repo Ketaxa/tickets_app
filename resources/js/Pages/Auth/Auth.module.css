@@ -7,11 +7,152 @@
 .formBlock {
     background-color: #ffffff;
     border-radius: 7px;
-    border: solid 1px black;
     display: flex;
     flex-direction: column;
     padding: 30px;
     gap: 15px;
+    z-index: 2;
+}
+
+.gradientBg {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        #667eea 0%,
+        #764ba2 25%,
+        #f093fb 50%,
+        #4facfe 75%,
+        #667eea 100%
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 12s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes gradientShift {
+    0%,
+    100% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+}
+/* Пузырьки / частицы на фоне */
+.particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.particle {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.95),
+        rgba(255, 255, 255, 0.1)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+        0 0 25px rgba(255, 255, 255, 0.8),
+        0 0 60px rgba(102, 126, 234, 0.7),
+        0 12px 40px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(14px);
+    animation: bubbleFloat 12s ease-in-out infinite;
+    opacity: 0.65;
+}
+
+/* Разные позиции/скорости/размеры через nth-child (имитация рандома) */
+.particle:nth-child(1) {
+    top: 72%;
+    left: 8%;
+    animation-duration: 11s;
+    transform-origin: -20% 120%;
+}
+.particle:nth-child(2) {
+    top: 18%;
+    left: 20%;
+    animation-duration: 13s;
+    transform-origin: 0% 0%;
+}
+.particle:nth-child(3) {
+    top: 60%;
+    left: 32%;
+    animation-duration: 10s;
+    width: 70px;
+    height: 70px;
+}
+.particle:nth-child(4) {
+    top: 30%;
+    left: 50%;
+    animation-duration: 14s;
+    width: 110px;
+    height: 110px;
+}
+.particle:nth-child(5) {
+    top: 78%;
+    left: 70%;
+    animation-duration: 12s;
+}
+.particle:nth-child(6) {
+    top: 16%;
+    left: 82%;
+    animation-duration: 15s;
+    width: 65px;
+    height: 65px;
+}
+.particle:nth-child(7) {
+    top: 40%;
+    left: 12%;
+    animation-duration: 9s;
+}
+.particle:nth-child(8) {
+    top: 50%;
+    left: 88%;
+    animation-duration: 13s;
+    width: 100px;
+    height: 100px;
+}
+.particle:nth-child(9) {
+    top: 10%;
+    left: 55%;
+    animation-duration: 12s;
+}
+.particle:nth-child(10) {
+    top: 85%;
+    left: 45%;
+    animation-duration: 16s;
+    width: 60px;
+    height: 60px;
+}
+
+@keyframes bubbleFloat {
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 0.2;
+    }
+    25% {
+        transform: translate3d(25px, -35px, 0) scale(1.05) rotate(2deg);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translate3d(-15px, -70px, 0) scale(1.15) rotate(-3deg);
+        opacity: 0.9;
+    }
+    75% {
+        transform: translate3d(20px, -40px, 0) scale(1.08) rotate(1deg);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 0.2;
+    }
 }
 
 /* Временная картинка и р-ры */

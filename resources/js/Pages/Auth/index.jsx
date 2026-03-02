@@ -5,6 +5,12 @@ export default function Auth() {
     const { errors } = usePage().props;
     return (
         <div className={styles.container}>
+            <div className={styles.gradientBg}></div>
+            <div className={styles.particles}>
+                {Array.from({ length: 10 }).map((_, i) => (
+                    <div key={i} className={styles.particle}></div>
+                ))}
+            </div>
             <Form className={styles.formBlock} method="post" action="/">
                 <div className={styles.pic_div}>
                     <img
