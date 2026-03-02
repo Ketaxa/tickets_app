@@ -13,35 +13,47 @@ export default function CreateTicket({ closeModalTicket }) {
     return (
         <div className={styles.modal}>
             <div className={styles.modalContent}>
-                <h2>Создать тикет</h2>
+                <div className={styles.mainTitle}>
+                    <b>Создать тикет</b>
+                </div>
                 <Form
                     method="POST"
                     action="/agent/create"
                     onSuccess={() => closeModalTicket()}
                 >
+                    <label htmlFor="user" className={styles.userLabel}>
+                        ID/Email клиента
+                    </label>
                     <input
                         type="text"
                         name="user_id_or_email"
-                        placeholder="Email или ID клиента"
+                        id="user"
                         className={styles.input}
                         required
                     />
+                    <label htmlFor="shortLabel" className={styles.userLabel}>
+                        Краткое описание
+                    </label>
                     <input
                         type="text"
+                        id="shortLabel"
                         name="short_desc"
-                        placeholder="Краткое описание"
                         className={styles.input}
                         required
                     />
+                    <label htmlFor="longLabel" className={styles.userLabel}>
+                        Подробное описание
+                    </label>
                     <textarea
                         name="full_desc"
-                        placeholder="Полное описание"
+                        id="longLabel"
                         className={styles.input}
                         required
                     />
                     <div className={styles.wrapper}>
                         <label className={styles.uploadBtn}>
-                            Выбрать файл
+                            <Clips />
+                            <p>Выбрать файл</p>
                             <input
                                 type="file"
                                 name="file"

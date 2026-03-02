@@ -23,9 +23,13 @@ export default function ModalSubscription({ closeModalTicket }) {
         <>
             <div className={styles.modal}>
                 <div className={styles.modalContent}>
-                    <h2>Проверить подписку</h2>
+                    <div className={styles.mainTitle}>
+                        <b>Проверить подписку</b>
+                    </div>
                     <Form method="POST" action="/agent/check">
-                        <label htmlFor="sub_user_id">ID пользователя</label>
+                        <label htmlFor="user_id" className={styles.userLabel}>
+                            ID пользователя
+                        </label>
                         <input
                             type="text"
                             name="sub_user_id"

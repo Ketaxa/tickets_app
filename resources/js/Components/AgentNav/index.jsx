@@ -7,7 +7,7 @@ export default function AgentNav({ openModalTicket, openModalSubscription }) {
     return (
         <>
             <div className={styles.container}>
-                <h1 className={styles.mainTitle}>Панель поддержки</h1>
+                <h1 className={styles.mainTitle}>Панель агента поддержки</h1>
                 <div className={styles.btnBar}>
                     <button
                         className={`${styles.button} ${styles.buttonBlue}`}
