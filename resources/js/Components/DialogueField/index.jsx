@@ -1,5 +1,8 @@
 import styles from "./DialogueField.module.css";
 import { router, Form } from "@inertiajs/react";
+import { useState } from "react";
+import Clips from "../../../../public/images/icons/Clips";
+import SendRow from "../../../../public/images/icons/SendRow";
 
 export default function DialogueField({
     ticket,
@@ -10,13 +13,32 @@ export default function DialogueField({
     if (!ticket) {
         return <p>Тикет не найден</p>;
     }
+    const lastRole = initialMessages?.length
+        ? initialMessages.at(-1).role
+        : null;
+    const [fileName, setFileName] = useState("Файл не выбран");
+    const handleChange = (e) => {
+        if (e.target.files.length > 0) {
+            setFileName(e.target.files[0].name);
+        }
+    };
     return (
         <div className={styles.ticketCard}>
             <div className={styles.ticketHeader}>
                 <div>
                     <strong> #ID - {ticket.id}</strong> —
                     {ticket.user_id_or_email}
-                    <span className={styles.badge}>Ожидает ответа</span>
+                    <span
+                        className={`${styles.badge} ${
+                            ticket.status === "closed"
+                                ? ""
+                                : lastRole === "support"
+                                  ? styles.badgeNew
+                                  : styles.badgeAnsw
+                        }`}
+                    >
+                        {ticket.status}
+                    </span>
                 </div>
                 <div className={styles.btn_bar}>
                     <button
@@ -61,14 +83,19 @@ export default function DialogueField({
                                     href={item.file}
                                     target="_blank"
                                     rel="noreferrer"
+                                    style={{ color: "white" }}
                                 >
                                     {item.file}
                                 </a>
                             )}
 
                             <div className={styles.chatTimestamp}>
-                                {item.timestamp}
-                                {item.role}
+                                <div>{item.timestamp}</div>
+                                <div>
+                                    {item.role === "support"
+                                        ? "Агент"
+                                        : "Тех. специалист"}
+                                </div>
                             </div>
                         </div>
                     );
@@ -90,12 +117,23 @@ export default function DialogueField({
                     name="message"
                 />
                 <input type="hidden" name="ticket_id" value={ticket.id}></input>
-                <input type="file" name="chat_file" />
+                {/* <input type="file" name="chat_file" /> */}
+                <div className={styles.wrapper}>
+                    <label className={styles.uploadBtn}>
+                        <Clips />
+                        <input
+                            type="file"
+                            name="chat_file"
+                            onChange={handleChange}
+                        />
+                    </label>
+                    <span className={styles.fileName}>{fileName}</span>
+                </div>
                 <button
                     type="submit"
                     className={`${styles.button} ${styles.buttonBlue}`}
                 >
-                    ➤
+                    <SendRow />
                 </button>
             </Form>
         </div>

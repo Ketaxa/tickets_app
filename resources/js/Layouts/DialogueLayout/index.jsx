@@ -14,8 +14,6 @@ export default function DialogueLayout({ children, baseUrl, role }) {
             subscription_result_type: null,
         },
     );
-    console.log(usePage().props);
-    console.log(removeFlash);
     const [modalTicket, setModalTicket] = useState(false);
     const [modalSubscription, setModalSubscription] = useState(false);
     const openModalTicket = () => {

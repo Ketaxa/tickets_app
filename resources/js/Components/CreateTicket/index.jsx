@@ -1,6 +1,7 @@
 import styles from "./CreateTicket.module.css";
 import { useState } from "react";
 import { Form } from "@inertiajs/react";
+import Clips from "../../../../public/images/icons/Clips";
 
 export default function CreateTicket({ closeModalTicket }) {
     const [fileName, setFileName] = useState("Файл не выбран");
