@@ -44,12 +44,15 @@ export default function ModalSubscription({ closeModalTicket }) {
                         <div className={styles.button_bar}>
                             <button
                                 type="button"
-                                className={styles.button}
+                                className={`${styles.button} ${styles.buttonGray}`}
                                 onClick={handleClose}
                             >
                                 Закрыть
                             </button>
-                            <button type="submit" className={styles.button}>
+                            <button
+                                type="submit"
+                                className={`${styles.button} ${styles.buttonPurple}`}
+                            >
                                 Проверить
                             </button>
                         </div>
