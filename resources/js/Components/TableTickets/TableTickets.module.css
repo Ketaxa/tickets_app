@@ -52,3 +52,23 @@
 .table tbody tr:nth-child(even) {
     background: #fcfbff;
 }
+.badge {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    background: #e2e3e5;
+    color: #6c757d;
+    margin-left: 8px;
+}
+
+.badgeAnsw {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badgeNew {
+    background: #d4edda;
+    color: #155724;
+}

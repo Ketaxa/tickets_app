@@ -5,7 +5,7 @@ import styles from "./SearchTickets.module.css";
 export default function SearchTickets({ sort, tab, baseUrl }) {
     const [searchValue, setSearchValue] = useState("");
     const menuItems = [
-        { label: "Ответы", value: "answered" },
+        { label: "Все", value: "answered" },
         { label: "По дате", value: "date" },
         { label: "Архив", value: "archive" },
     ];

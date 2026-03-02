@@ -32,7 +32,20 @@ export default function TableTickets({ tickets, baseUrl }) {
                             <td>{item.id}</td>
                             <td>{item.user_id_or_email}</td>
                             <td>{item.short_desc}</td>
-                            <td>{item.status}</td>
+                            <td>
+                                {" "}
+                                <span
+                                    className={`${styles.badge} ${
+                                        item.status === "closed"
+                                            ? ""
+                                            : item.status === "new"
+                                              ? styles.badgeNew
+                                              : styles.badgeAnsw
+                                    }`}
+                                >
+                                    {item.status}
+                                </span>
+                            </td>
                             <td>{dataTicket(item.created_at)}</td>
                         </tr>
                     ))

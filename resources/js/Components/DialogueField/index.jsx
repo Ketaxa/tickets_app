@@ -115,6 +115,7 @@ export default function DialogueField({
                     placeholder="Напишите сообщение..."
                     className={styles.input}
                     name="message"
+                    required
                 />
                 <input type="hidden" name="ticket_id" value={ticket.id}></input>
                 {/* <input type="file" name="chat_file" /> */}

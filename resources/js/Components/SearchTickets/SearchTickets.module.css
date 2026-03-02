@@ -27,14 +27,13 @@ input::placeholder {
 }
 .buttonActive {
     font-size: 16px;
-
-    background: #4f8ef7;
+    background: #b93ae4;
     color: white;
 }
 .buttonUnactive {
     font-size: 16px;
     background: #f1e9fe;
-    color: #311f52;
+    color: #b93ae4;
 }
 .button_bar {
     display: flex;
