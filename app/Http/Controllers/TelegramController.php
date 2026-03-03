@@ -13,6 +13,6 @@ class TelegramController extends Controller
     ) {
         $service->handle($request->all());
 
-        return response()->json(['ok' => true]);
+        return response()->noContent();
     }
 }
