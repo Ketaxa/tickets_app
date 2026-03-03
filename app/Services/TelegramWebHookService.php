@@ -24,13 +24,16 @@ class TelegramWebHookService
 
         if ($text === '/start') {
 
-            TelegramSubscriber::firstOrCreate([
+             // 1. Создаём подписчика или берём существующего
+            $subscriber = TelegramSubscriber::firstOrCreate([
                 'chat_id' => $chatId
             ]);
 
-            $this->sendMessage($chatId, 
-                "Вы подписались на уведомления о новых тикетах!"
-            );
+            // 2. Обновляем объект, чтобы он точно соответствовал базе
+            $subscriber->refresh();
+
+            // 3. Отправляем подтверждение пользователю
+            $this->sendMessage($chatId, "Вы подписались на уведомления о новых тикетах!");
         }
     }
 
