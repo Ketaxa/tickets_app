@@ -2,6 +2,19 @@ import styles from "./TableTickets.module.css";
 import { format } from "date-fns";
 import { router } from "@inertiajs/react";
 export default function TableTickets({ tickets, baseUrl }) {
+    const setStatus = (status) => {
+        switch (status) {
+            case "new":
+                return <>Новый</>;
+                break;
+            case "answered":
+                return <>Ответ получен</>;
+                break;
+            case "closed":
+                return <>Закрыт</>;
+                break;
+        }
+    };
     const dataTicket = (item) => {
         return format(new Date(item), "dd-MM-yyyy");
     };
@@ -43,7 +56,7 @@ export default function TableTickets({ tickets, baseUrl }) {
                                               : styles.badgeAnsw
                                     }`}
                                 >
-                                    {item.status}
+                                    {setStatus(item.status)}
                                 </span>
                             </td>
                             <td>{dataTicket(item.created_at)}</td>
