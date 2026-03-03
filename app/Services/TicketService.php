@@ -44,8 +44,11 @@ class TicketService
          * Ф-я сортировки
          */
         if ($sort === 'date') {
-            $tickets = $tickets->orderBy('created_at', 'desc');
-        } else {
+            $tickets = $tickets->orderBy('created_at', 'asc');
+        } elseif ($sort === 'date_desc') {
+            $tickets = $tickets->orderBy('created_at', 'desc'); 
+        }
+         else {
             $tickets = $tickets->orderByRaw("FIELD(status,'answered') ASC")
                 ->orderBy('created_at', 'desc');
         }

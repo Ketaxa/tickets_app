@@ -3,10 +3,12 @@ import { Form, router } from "@inertiajs/react";
 
 import styles from "./SearchTickets.module.css";
 export default function SearchTickets({ sort, tab, baseUrl }) {
+    const [dataSort, setDataSort] = useState("data");
     const [searchValue, setSearchValue] = useState("");
     const menuItems = [
         { label: "Все", value: "answered" },
-        { label: "По дате", value: "date" },
+        { label: "По дате (раньше)", value: "date_desc" },
+        { label: "По дате (позже)", value: "date" },
         { label: "Архив", value: "archive" },
     ];
     const handleSort = (value) => {
