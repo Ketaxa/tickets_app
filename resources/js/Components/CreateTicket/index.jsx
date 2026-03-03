@@ -1,6 +1,5 @@
 import styles from "./CreateTicket.module.css";
 import { useState } from "react";
-import { useState } from "react";
 import { Form } from "@inertiajs/react";
 import Clips from "../../../../public/images/icons/Clips";
 
