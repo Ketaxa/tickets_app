@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 class TelegramService
 {
-    public static function sendMessageToAll($message)
+    public function sendMessageToAll($message)
     {
         $subscribers = TelegramSubscriber::all();
         $token = config('services.telegram.bot_token');

@@ -10,7 +10,12 @@ use App\Services\TelegramService;
 class TicketService
 {
     protected $allowedFileExt = ['jpg', 'jpeg', 'png', 'pdf', 'zip', 'txt'];
+    protected TelegramService $telegramService;
 
+    public function __construct(TelegramService $telegramService)
+    {
+        $this->telegramService = $telegramService;
+    }
     /**
      * Ф-я получения тикетов и сортировки
      */
@@ -88,7 +93,7 @@ class TicketService
     ]);
 
     $message = "Новый тикет: #{$ticket->id} - {$ticket->short_desc}";
-    TelegramService::sendMessageToAll($message);
+    $this->telegramService->sendMessageToAll($message);
 
     return $ticket;
     }
