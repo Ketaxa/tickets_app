@@ -1,14 +1,19 @@
 import styles from "./CreateTicket.module.css";
 import { useState } from "react";
+import { useState } from "react";
 import { Form } from "@inertiajs/react";
 import Clips from "../../../../public/images/icons/Clips";
 
 export default function CreateTicket({ closeModalTicket }) {
+    const [isBlock, setIsBlock] = useState(false);
     const [fileName, setFileName] = useState("Файл не выбран");
     const handleChange = (e) => {
         if (e.target.files.length > 0) {
             setFileName(e.target.files[0].name);
         }
+    };
+    const handleSubmit = (e) => {
+        setIsBlock(true);
     };
     return (
         <div className={styles.modal}>
@@ -19,7 +24,10 @@ export default function CreateTicket({ closeModalTicket }) {
                 <Form
                     method="POST"
                     action="/agent/create"
-                    onSuccess={() => closeModalTicket()}
+                    onSuccess={() => {
+                        (closeModalTicket(), setIsBlock(false));
+                    }}
+                    onSubmit={handleSubmit}
                     disableWhileProcessing
                     className="inert:opacity-50 inert:pointer-events-none"
                 >
@@ -76,6 +84,7 @@ export default function CreateTicket({ closeModalTicket }) {
                         </button>
                         <button
                             type="submit"
+                            disabled={isBlock}
                             className={`${styles.button} ${styles.buttonBlue}`}
                         >
                             Создать
