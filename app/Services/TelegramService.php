@@ -9,7 +9,7 @@ class TelegramService
     public static function sendMessageToAll($message)
     {
         $subscribers = TelegramSubscriber::all();
-        $token = env('TELEGRAM_BOT_TOKEN');
+        $token = config('services.telegram.bot_token');
 
         foreach ($subscribers as $sub) {
             Http::post("https://api.telegram.org/bot{$token}/sendMessage", [

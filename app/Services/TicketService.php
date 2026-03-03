@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Ticket;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use App\Services\TelegramService;
 
 class TicketService
 {
@@ -18,7 +19,7 @@ class TicketService
         string $sort)
     {
         /**
-         * Рабочий запрос для блейдов, не ломать!
+         * Запрос на тикеты
          */
         $tickets = Ticket::query()
             ->when($tab === 'archive', fn ($q) => $q->where('status', 'closed'))
@@ -33,12 +34,9 @@ class TicketService
                 });
             });
 
-        /**
-         * Ф-я сортировки
-         */
 
         /**
-         * Рабочая сортировка для блейдов, не ломать!
+         * Ф-я сортировки
          */
         if ($sort === 'date') {
             $tickets = $tickets->orderBy('created_at', 'desc');

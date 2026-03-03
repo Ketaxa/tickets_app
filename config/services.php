@@ -13,6 +13,9 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'telegram' => [
+    'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+],
     'authData' => [
         'support_login' => env('SUPPORT_LOGIN'),
         'support_password' => env('SUPPORT_PASSWORD'),
