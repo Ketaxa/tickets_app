@@ -20,6 +20,7 @@ export default function CreateTicket({ closeModalTicket }) {
                     method="POST"
                     action="/agent/create"
                     onSuccess={() => closeModalTicket()}
+                    disableWhileProcessing
                 >
                     <label htmlFor="user" className={styles.userLabel}>
                         ID/Email клиента
