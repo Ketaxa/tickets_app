@@ -7,9 +7,6 @@ use App\Http\Middleware\SupportAgentAuth;
 use App\Http\Middleware\SupportTechAuth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use App\Models\TelegramSubscriber;
 
 Route::get('/', function () {
     return Inertia::render('Auth', [
