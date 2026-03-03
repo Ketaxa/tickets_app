@@ -21,10 +21,12 @@ export default function CreateTicket({ closeModalTicket }) {
                     action="/agent/create"
                     onSuccess={() => closeModalTicket()}
                     disableWhileProcessing
+                    className="inert:opacity-50 inert:pointer-events-none"
                 >
                     <label htmlFor="user" className={styles.userLabel}>
                         ID/Email клиента
                     </label>
+
                     <input
                         type="text"
                         name="user_id_or_email"
