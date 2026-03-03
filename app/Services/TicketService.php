@@ -93,7 +93,8 @@ class TicketService
     ]);
 
     $message = "Новый тикет: #{$ticket->id} - {$ticket->short_desc}";
-    $this->telegramService->sendMessageToAll($message);
+    (new TelegramService())->sendMessageToAll($message);
+    // $this->telegramService->sendMessageToAll($message);
 
     return $ticket;
     }
